@@ -1,6 +1,52 @@
 <?php
 $page = $_GET['page'] ?? 'dashboard';
 
+// Database Setup
+$db_file = __DIR__ . '/database.sqlite';
+try {
+    $pdo = new PDO("sqlite:$db_file");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Create RFIs table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS rfis (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ref_number TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'Open',
+            priority TEXT NOT NULL DEFAULT 'Medium',
+            due_date TEXT NOT NULL
+        )
+    ");
+} catch (PDOException $e) {
+    die("Database Connection failed: " . $e->getMessage());
+}
+
+// Handle RFI Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_rfi') {
+    $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date) VALUES (:ref_number, :subject, :status, :priority, :due_date)");
+    $stmt->execute([
+        ':ref_number' => $_POST['ref_number'] ?? '',
+        ':subject' => $_POST['subject'] ?? '',
+        ':status' => $_POST['status'] ?? 'Open',
+        ':priority' => $_POST['priority'] ?? 'Medium',
+        ':due_date' => $_POST['due_date'] ?? ''
+    ]);
+    header("Location: index.php?page=rfis");
+    exit;
+}
+
+// Fetch RFIs
+$rfi_search = $_GET['search'] ?? '';
+if ($rfi_search) {
+    $stmt = $pdo->prepare("SELECT * FROM rfis WHERE subject LIKE :search OR ref_number LIKE :search ORDER BY id DESC");
+    $stmt->execute([':search' => "%$rfi_search%"]);
+    $rfis = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $stmt = $pdo->query("SELECT * FROM rfis ORDER BY id DESC");
+    $rfis = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Mock Data
 $recent_activities = [
     ['id' => 1, 'event' => 'Concrete Pour - Foundation', 'date' => 'Oct 24, 2023', 'status' => 'Completed'],
@@ -24,6 +70,10 @@ $recent_activities = [
                     colors: {
                         primary: '#3C50E0',
                         bodybg: '#F1F5F9',
+                        success: '#219653',
+                        warning: '#F2994A',
+                        danger: '#D34053',
+                        stroke: '#E2E8F0',
                     }
                 }
             }
@@ -58,7 +108,7 @@ $recent_activities = [
                             </li>
                             <!-- Menu Item RFIs -->
                             <li>
-                                <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium <?php echo $page === 'rfis' ? 'text-white bg-slate-800' : 'text-slate-300 hover:bg-slate-800 hover:text-white'; ?> duration-300 ease-in-out" href="?page=rfis">
+                                <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium <?php echo in_array($page, ['rfis', 'create_rfi']) ? 'text-white bg-slate-800' : 'text-slate-300 hover:bg-slate-800 hover:text-white'; ?> duration-300 ease-in-out" href="?page=rfis">
                                     <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"></path>
                                     </svg>
@@ -296,9 +346,161 @@ $recent_activities = [
                     </div>
 
                     <?php elseif ($page === 'rfis'): ?>
-                        <h2 class="text-2xl font-bold text-black mb-4">Requests for Information (RFIs)</h2>
-                        <div class="rounded-sm border border-slate-200 bg-white p-6 shadow-default">
-                            <p class="text-slate-600">RFI management content will be displayed here.</p>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Requests for Information (RFIs)</h2>
+                            <a href="?page=create_rfi" class="inline-flex items-center justify-center rounded-md bg-primary py-2 px-6 text-center font-medium text-white hover:bg-opacity-90">
+                                Create RFI
+                            </a>
+                        </div>
+
+                        <!-- Search Form -->
+                        <div class="mb-6 rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="p-4 md:p-6">
+                                <form action="index.php" method="GET" class="flex items-center gap-3">
+                                    <input type="hidden" name="page" value="rfis">
+                                    <div class="relative w-full md:w-1/2">
+                                        <button class="absolute left-4 top-1/2 -translate-y-1/2">
+                                            <svg class="fill-body hover:fill-primary" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9.16666 3.33332C5.945 3.33332 3.33332 5.945 3.33332 9.16666C3.33332 12.3883 5.945 15 9.16666 15C12.3883 15 15 12.3883 15 9.16666C15 5.945 12.3883 3.33332 9.16666 3.33332ZM1.66666 9.16666C1.66666 5.02452 5.02452 1.66666 9.16666 1.66666C13.3088 1.66666 16.6667 5.02452 16.6667 9.16666C16.6667 11.0028 15.9922 12.6841 14.8876 13.9875L18.0893 17.1892C18.4147 17.5147 18.4147 18.0423 18.0893 18.3677C17.7638 18.6932 17.2362 18.6932 16.9107 18.3677L13.709 15.166C12.4056 16.2706 10.7243 16.9451 8.8882 16.9451C4.74606 16.9451 1.3882 13.5872 1.3882 9.4451C1.3882 5.30296 4.74606 1.9451 8.8882 1.9451C13.0303 1.9451 16.3882 5.30296 16.3882 9.4451C16.3882 13.5872 13.0303 16.9451 8.8882 16.9451Z" fill=""></path>
+                                            </svg>
+                                        </button>
+                                        <input type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Search RFIs..." class="w-full rounded-md border border-stroke bg-transparent py-2 pl-12 pr-4 font-medium outline-none focus:border-primary focus-visible:shadow-none">
+                                    </div>
+                                    <button type="submit" class="rounded-md bg-primary py-2 px-6 font-medium text-white hover:bg-opacity-90">Search</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- TailAdmin Table Two -->
+                        <div class="rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="py-6 px-4 md:px-6 xl:px-7.5">
+                                <h4 class="text-xl font-bold text-black">RFI List</h4>
+                            </div>
+
+                            <div class="grid grid-cols-6 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5">
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Ref #</p>
+                                </div>
+                                <div class="col-span-3 flex items-center">
+                                    <p class="font-medium">Subject</p>
+                                </div>
+                                <div class="col-span-2 hidden items-center sm:flex">
+                                    <p class="font-medium">Priority</p>
+                                </div>
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Due Date</p>
+                                </div>
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Status</p>
+                                </div>
+                            </div>
+
+                            <?php if (empty($rfis)): ?>
+                            <div class="py-4.5 px-4 md:px-6 2xl:px-7.5">
+                                <p class="text-slate-500 text-center py-4">No RFIs found.</p>
+                            </div>
+                            <?php else: ?>
+                                <?php foreach ($rfis as $rfi): ?>
+                                <div class="grid grid-cols-6 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5">
+                                    <div class="col-span-1 flex items-center">
+                                        <p class="text-sm text-black">#<?php echo htmlspecialchars($rfi['ref_number']); ?></p>
+                                    </div>
+                                    <div class="col-span-3 flex items-center">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($rfi['subject']); ?></p>
+                                    </div>
+                                    <div class="col-span-2 hidden items-center sm:flex">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($rfi['priority']); ?></p>
+                                    </div>
+                                    <div class="col-span-1 flex items-center">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($rfi['due_date']); ?></p>
+                                    </div>
+                                    <div class="col-span-1 flex items-center">
+                                        <?php if ($rfi['status'] === 'Closed'): ?>
+                                            <p class="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">Closed</p>
+                                        <?php else: ?>
+                                            <p class="inline-flex rounded-full bg-warning bg-opacity-10 py-1 px-3 text-sm font-medium text-warning">Open</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                    <?php elseif ($page === 'create_rfi'): ?>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Create New RFI</h2>
+                        </div>
+
+                        <div class="rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="border-b border-stroke py-4 px-6.5">
+                                <h3 class="font-medium text-black">
+                                    RFI Details
+                                </h3>
+                            </div>
+                            <form action="index.php" method="POST">
+                                <input type="hidden" name="action" value="create_rfi">
+                                <div class="p-6.5">
+                                    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Reference Number <span class="text-danger">*</span></label>
+                                            <input type="text" name="ref_number" required placeholder="e.g., RFI-001" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter">
+                                        </div>
+
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Due Date <span class="text-danger">*</span></label>
+                                            <div class="relative">
+                                                <input type="date" name="due_date" required class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4.5">
+                                        <label class="mb-2.5 block text-black">Subject <span class="text-danger">*</span></label>
+                                        <input type="text" name="subject" required placeholder="Brief description of the issue" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter">
+                                    </div>
+
+                                    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Status</label>
+                                            <div class="relative z-20 bg-transparent dark:bg-form-input">
+                                                <select name="status" class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary">
+                                                    <option value="Open">Open</option>
+                                                    <option value="Closed">Closed</option>
+                                                </select>
+                                                <span class="absolute top-1/2 right-4 z-30 -translate-y-1/2">
+                                                    <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <g opacity="0.8">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill=""></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Priority</label>
+                                            <div class="relative z-20 bg-transparent dark:bg-form-input">
+                                                <select name="priority" class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary">
+                                                    <option value="Low">Low</option>
+                                                    <option value="Medium" selected>Medium</option>
+                                                    <option value="High">High</option>
+                                                </select>
+                                                <span class="absolute top-1/2 right-4 z-30 -translate-y-1/2">
+                                                    <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <g opacity="0.8">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill=""></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button class="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90 text-white">
+                                        Submit RFI
+                                    </button>
+                                </div>
+                            </form>
                         </div>
 
                     <?php elseif ($page === 'budget'): ?>
