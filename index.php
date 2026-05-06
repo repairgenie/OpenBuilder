@@ -55,6 +55,39 @@ $recent_activities = [
     ['id' => 4, 'event' => 'RFI #42 - Change to Beam Specs', 'date' => 'Oct 24, 2023', 'status' => 'In Review'],
 ];
 
+// Budget Logic
+$cost_codes = [
+    ['code' => '03-300', 'name' => 'Concrete', 'original_budget' => 150000, 'change_orders' => 12000, 'committed_costs' => 145000],
+    ['code' => '05-100', 'name' => 'Structural Steel', 'original_budget' => 200000, 'change_orders' => 0, 'committed_costs' => 180000],
+    ['code' => '09-200', 'name' => 'Drywall', 'original_budget' => 85000, 'change_orders' => -5000, 'committed_costs' => 40000],
+    ['code' => '26-000', 'name' => 'Electrical', 'original_budget' => 120000, 'change_orders' => 25000, 'committed_costs' => 135000],
+    ['code' => '22-000', 'name' => 'Plumbing', 'original_budget' => 95000, 'change_orders' => 5000, 'committed_costs' => 98000],
+];
+
+function calculate_budget_metrics($code) {
+    $revised_budget = $code['original_budget'] + $code['change_orders'];
+    $percentage_spent = $revised_budget > 0 ? ($code['committed_costs'] / $revised_budget) * 100 : 0;
+    return [
+        'revised_budget' => $revised_budget,
+        'percentage_spent' => min(100, max(0, $percentage_spent)), // Cap between 0-100 for progress bar
+        'variance' => $revised_budget - $code['committed_costs']
+    ];
+}
+
+$total_contract = 0;
+$total_spent = 0;
+$projected_variance = 0;
+
+$processed_cost_codes = [];
+foreach ($cost_codes as $code) {
+    $metrics = calculate_budget_metrics($code);
+    $total_contract += $metrics['revised_budget'];
+    $total_spent += $code['committed_costs'];
+    $projected_variance += $metrics['variance'];
+
+    $processed_cost_codes[] = array_merge($code, $metrics);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -504,9 +537,112 @@ $recent_activities = [
                         </div>
 
                     <?php elseif ($page === 'budget'): ?>
-                        <h2 class="text-2xl font-bold text-black mb-4">Budget</h2>
-                        <div class="rounded-sm border border-slate-200 bg-white p-6 shadow-default">
-                            <p class="text-slate-600">Budget management content will be displayed here.</p>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Budget & Cost Management</h2>
+                        </div>
+
+                        <!-- Top Metrics Cards -->
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-3 2xl:gap-7.5 mb-6">
+                            <!-- Card Item -->
+                            <div class="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default">
+                                <div class="mt-4 flex items-end justify-between">
+                                    <div>
+                                        <h4 class="text-title-md font-bold text-black">
+                                            $<?php echo number_format($total_contract, 2); ?>
+                                        </h4>
+                                        <span class="text-sm font-medium">Total Contract (Revised)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card Item -->
+                            <div class="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default">
+                                <div class="mt-4 flex items-end justify-between">
+                                    <div>
+                                        <h4 class="text-title-md font-bold text-black">
+                                            $<?php echo number_format($total_spent, 2); ?>
+                                        </h4>
+                                        <span class="text-sm font-medium">Total Spent</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card Item -->
+                            <div class="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default">
+                                <div class="mt-4 flex items-end justify-between">
+                                    <div>
+                                        <h4 class="text-title-md font-bold <?php echo $projected_variance < 0 ? 'text-danger' : 'text-success'; ?>">
+                                            $<?php echo number_format($projected_variance, 2); ?>
+                                        </h4>
+                                        <span class="text-sm font-medium">Projected Variance</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
+                        <div class="rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="py-6 px-4 md:px-6 xl:px-7.5">
+                                <h4 class="text-xl font-bold text-black">Cost Codes</h4>
+                            </div>
+
+                            <div class="grid grid-cols-6 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5 bg-slate-50">
+                                <div class="col-span-2 flex items-center">
+                                    <p class="font-medium text-black">Cost Code</p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="font-medium text-black text-right">Original Budget</p>
+                                </div>
+                                <div class="col-span-1 hidden items-center justify-end sm:flex">
+                                    <p class="font-medium text-black text-right">Change Orders</p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="font-medium text-black text-right">Revised Budget</p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="font-medium text-black text-right">Committed Costs</p>
+                                </div>
+                                <div class="col-span-2 flex items-center justify-center">
+                                    <p class="font-medium text-black">Consumption</p>
+                                </div>
+                            </div>
+
+                            <?php foreach ($processed_cost_codes as $code): ?>
+                            <div class="grid grid-cols-6 border-t border-stroke py-4.5 px-4 sm:grid-cols-8 md:px-6 2xl:px-7.5">
+                                <div class="col-span-2 flex flex-col">
+                                    <p class="text-sm text-black font-semibold"><?php echo htmlspecialchars($code['code']); ?></p>
+                                    <p class="text-xs text-slate-500"><?php echo htmlspecialchars($code['name']); ?></p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="text-sm text-black font-mono text-right">$<?php echo number_format($code['original_budget'], 2); ?></p>
+                                </div>
+                                <div class="col-span-1 hidden items-center justify-end sm:flex">
+                                    <p class="text-sm font-mono text-right <?php echo $code['change_orders'] < 0 ? 'text-danger' : ($code['change_orders'] > 0 ? 'text-success' : 'text-black'); ?>">
+                                        $<?php echo number_format($code['change_orders'], 2); ?>
+                                    </p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="text-sm text-black font-mono font-semibold text-right">$<?php echo number_format($code['revised_budget'], 2); ?></p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="text-sm text-black font-mono text-right">$<?php echo number_format($code['committed_costs'], 2); ?></p>
+                                </div>
+                                <div class="col-span-2 flex flex-col justify-center px-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-xs font-medium text-black"><?php echo number_format($code['percentage_spent'], 1); ?>%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 rounded-full h-2.5">
+                                        <?php
+                                            $bar_color = 'bg-primary';
+                                            if ($code['percentage_spent'] >= 100) {
+                                                $bar_color = 'bg-danger';
+                                            } elseif ($code['percentage_spent'] > 85) {
+                                                $bar_color = 'bg-warning';
+                                            }
+                                        ?>
+                                        <div class="<?php echo $bar_color; ?> h-2.5 rounded-full" style="width: <?php echo $code['percentage_spent']; ?>%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
 
                     <?php else: ?>
