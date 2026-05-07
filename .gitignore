@@ -1,0 +1,17 @@
+# Assets
+node_modules/
+.DS_Store
+
+# Databases
+*.sqlite
+*.sqlite-journal
+
+# Logs
+*.log
+
+# Environment
+.env
+.gemini/
+
+# Vendor
+vendor/
