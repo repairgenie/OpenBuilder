@@ -18,6 +18,18 @@ try {
             due_date TEXT NOT NULL
         )
     ");
+
+    // Create Daily Logs table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS daily_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            log_date TEXT NOT NULL,
+            weather TEXT,
+            manpower INTEGER,
+            work_performed TEXT,
+            ai_report TEXT
+        )
+    ");
 } catch (PDOException $e) {
     die("Database Connection failed: " . $e->getMessage());
 }
@@ -36,6 +48,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
+// Handle Daily Log Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_daily_log') {
+    $log_date = $_POST['log_date'] ?? '';
+    $weather = $_POST['weather'] ?? '';
+    $manpower = $_POST['manpower'] ?? 0;
+    $work_performed = $_POST['work_performed'] ?? '';
+
+    $ai_report = "";
+
+    // Gemini API Integration
+    $api_key = getenv('GEMINI_API_KEY');
+    if ($api_key) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=' . $api_key;
+
+        $prompt = "You are an expert construction project manager. Transform the following field notes into a professional daily report. Clean up the shorthand, write in complete sentences. Detect and explicitly list any safety risks or scheduling risks mentioned.\n\nField Notes:\n" . $work_performed . "\n\nFormat the response with Markdown using clear headings for 'Work Performed', 'Safety Risks', and 'Scheduling Risks'.";
+
+        $data = [
+            "contents" => [
+                [
+                    "parts" => [
+                        ["text" => $prompt]
+                    ]
+                ]
+            ]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if ($response) {
+            $result = json_decode($response, true);
+            if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+                $ai_report = $result['candidates'][0]['content']['parts'][0]['text'];
+            } else {
+                $ai_report = "Error parsing AI response.";
+            }
+        } else {
+            $ai_report = "Failed to connect to AI API.";
+        }
+    } else {
+        $ai_report = "AI Generation skipped. GEMINI_API_KEY not found.";
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO daily_logs (log_date, weather, manpower, work_performed, ai_report) VALUES (:log_date, :weather, :manpower, :work_performed, :ai_report)");
+    $stmt->execute([
+        ':log_date' => $log_date,
+        ':weather' => $weather,
+        ':manpower' => $manpower,
+        ':work_performed' => $work_performed,
+        ':ai_report' => $ai_report
+    ]);
+
+    $log_id = $pdo->lastInsertId();
+    header("Location: index.php?page=view_daily_log&id=" . $log_id);
+    exit;
+}
+
 // Fetch RFIs
 $rfi_search = $_GET['search'] ?? '';
 if ($rfi_search) {
@@ -45,6 +120,20 @@ if ($rfi_search) {
 } else {
     $stmt = $pdo->query("SELECT * FROM rfis ORDER BY id DESC");
     $rfis = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch Daily Logs
+if ($page === 'daily_logs') {
+    $stmt = $pdo->query("SELECT * FROM daily_logs ORDER BY log_date DESC, id DESC");
+    $daily_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch single Daily Log for viewing
+$view_log = null;
+if ($page === 'view_daily_log' && isset($_GET['id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM daily_logs WHERE id = :id");
+    $stmt->execute([':id' => $_GET['id']]);
+    $view_log = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // Mock Data
@@ -146,6 +235,15 @@ foreach ($cost_codes as $code) {
                                         <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"></path>
                                     </svg>
                                     RFIs
+                                </a>
+                            </li>
+                            <!-- Menu Item Daily Logs -->
+                            <li>
+                                <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium <?php echo in_array($page, ['daily_logs', 'create_daily_log', 'view_daily_log']) ? 'text-white bg-slate-800' : 'text-slate-300 hover:bg-slate-800 hover:text-white'; ?> duration-300 ease-in-out" href="?page=daily_logs">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"></path>
+                                    </svg>
+                                    Daily Logs
                                 </a>
                             </li>
                             <!-- Menu Item Budget -->
@@ -535,6 +633,161 @@ foreach ($cost_codes as $code) {
                                 </div>
                             </form>
                         </div>
+
+                    <?php elseif ($page === 'daily_logs'): ?>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Daily Logs</h2>
+                            <a href="?page=create_daily_log" class="inline-flex items-center justify-center rounded-md bg-primary py-2 px-6 text-center font-medium text-white hover:bg-opacity-90">
+                                Create Daily Log
+                            </a>
+                        </div>
+
+                        <!-- TailAdmin Table Two -->
+                        <div class="rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="py-6 px-4 md:px-6 xl:px-7.5">
+                                <h4 class="text-xl font-bold text-black">Submitted Logs</h4>
+                            </div>
+
+                            <div class="grid grid-cols-4 border-t border-stroke py-4.5 px-4 md:px-6 2xl:px-7.5">
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Date</p>
+                                </div>
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Weather</p>
+                                </div>
+                                <div class="col-span-1 flex items-center">
+                                    <p class="font-medium">Manpower</p>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-end">
+                                    <p class="font-medium">Action</p>
+                                </div>
+                            </div>
+
+                            <?php if (empty($daily_logs)): ?>
+                            <div class="py-4.5 px-4 md:px-6 2xl:px-7.5">
+                                <p class="text-slate-500 text-center py-4">No Daily Logs found.</p>
+                            </div>
+                            <?php else: ?>
+                                <?php foreach ($daily_logs as $log): ?>
+                                <div class="grid grid-cols-4 border-t border-stroke py-4.5 px-4 md:px-6 2xl:px-7.5 hover:bg-slate-50">
+                                    <div class="col-span-1 flex items-center">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($log['log_date']); ?></p>
+                                    </div>
+                                    <div class="col-span-1 flex items-center">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($log['weather']); ?></p>
+                                    </div>
+                                    <div class="col-span-1 flex items-center">
+                                        <p class="text-sm text-black"><?php echo htmlspecialchars($log['manpower']); ?></p>
+                                    </div>
+                                    <div class="col-span-1 flex items-center justify-end">
+                                        <a href="?page=view_daily_log&id=<?php echo $log['id']; ?>" class="text-primary hover:underline text-sm font-medium">View Report</a>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                    <?php elseif ($page === 'create_daily_log'): ?>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Create Daily Log</h2>
+                        </div>
+
+                        <div class="rounded-sm border border-stroke bg-white shadow-default">
+                            <div class="border-b border-stroke py-4 px-6.5">
+                                <h3 class="font-medium text-black">
+                                    Field Notes
+                                </h3>
+                            </div>
+                            <form action="index.php" method="POST">
+                                <input type="hidden" name="action" value="create_daily_log">
+                                <div class="p-6.5">
+                                    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Date <span class="text-danger">*</span></label>
+                                            <div class="relative">
+                                                <input type="date" name="log_date" required class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary">
+                                            </div>
+                                        </div>
+
+                                        <div class="w-full xl:w-1/2">
+                                            <label class="mb-2.5 block text-black">Manpower Count <span class="text-danger">*</span></label>
+                                            <input type="number" name="manpower" required min="0" placeholder="e.g. 15" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4.5">
+                                        <label class="mb-2.5 block text-black">Weather Conditions <span class="text-danger">*</span></label>
+                                        <input type="text" name="weather" required placeholder="e.g. 75F, Sunny" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter">
+                                    </div>
+
+                                    <div class="mb-6">
+                                        <label class="mb-2.5 block text-black">Work Performed (Field Shorthand) <span class="text-danger">*</span></label>
+                                        <textarea rows="6" name="work_performed" required placeholder="Type notes here... AI will translate to professional report." class="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter"></textarea>
+                                    </div>
+
+                                    <button class="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90 text-white">
+                                        Submit Field Notes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    <?php elseif ($page === 'view_daily_log'): ?>
+                        <?php if ($view_log): ?>
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h2 class="text-2xl font-bold text-black">Daily Report - <?php echo htmlspecialchars($view_log['log_date']); ?></h2>
+                            <button onclick="alert('PDF Generated! (Mocked)')" class="inline-flex items-center justify-center rounded-md bg-white border border-stroke py-2 px-6 text-center font-medium text-black hover:bg-slate-50">
+                                Print to PDF
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                            <!-- Left Column: AI Report -->
+                            <div class="xl:col-span-2">
+                                <div class="rounded-sm border border-stroke bg-white shadow-default p-6">
+                                    <h3 class="text-xl font-semibold text-black mb-4">AI Generated Report</h3>
+                                    <div class="prose max-w-none text-black">
+                                        <?php
+                                            // Simple parser for basic Markdown formatting in the AI report
+                                            $formatted_report = htmlspecialchars($view_log['ai_report']);
+                                            $formatted_report = preg_replace('/### (.*)/', '<h4 class="text-lg font-bold mt-4 mb-2">$1</h4>', $formatted_report);
+                                            $formatted_report = preg_replace('/## (.*)/', '<h3 class="text-xl font-bold mt-5 mb-3">$1</h3>', $formatted_report);
+                                            $formatted_report = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $formatted_report);
+                                            $formatted_report = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $formatted_report);
+                                            $formatted_report = preg_replace('/- (.*)/', '<li class="ml-4 list-disc">$1</li>', $formatted_report);
+                                            echo nl2br($formatted_report);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Original Field Data -->
+                            <div class="xl:col-span-1">
+                                <div class="rounded-sm border border-stroke bg-white shadow-default p-6">
+                                    <h3 class="text-xl font-semibold text-black mb-4">Field Data</h3>
+
+                                    <div class="mb-4">
+                                        <span class="block text-sm font-medium text-slate-500 mb-1">Weather</span>
+                                        <p class="text-black font-medium"><?php echo htmlspecialchars($view_log['weather']); ?></p>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <span class="block text-sm font-medium text-slate-500 mb-1">Manpower</span>
+                                        <p class="text-black font-medium"><?php echo htmlspecialchars($view_log['manpower']); ?></p>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <span class="block text-sm font-medium text-slate-500 mb-1">Raw Field Notes</span>
+                                        <p class="text-black text-sm p-3 bg-slate-50 border border-stroke rounded"><?php echo nl2br(htmlspecialchars($view_log['work_performed'])); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php else: ?>
+                            <div class="rounded-sm border border-slate-200 bg-white p-6 shadow-default">
+                                <p class="text-slate-600">Daily Log not found.</p>
+                            </div>
+                        <?php endif; ?>
 
                     <?php elseif ($page === 'budget'): ?>
                         <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
