@@ -118,7 +118,20 @@
                 </div>
             </div>
 
-            <!-- Language Switcher -->
+            <!-- Region Switcher -->
+        <div class="relative group">
+            <button class="flex items-center gap-1 text-sm font-bold text-slate-600 hover:text-primary uppercase">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <?php echo $region; ?>
+            </button>
+            <div class="absolute right-0 mt-2 w-32 bg-white border border-stroke rounded shadow-xl hidden group-hover:block z-9999">
+                <a href="?page=<?php echo $page; ?>&lang=<?php echo $lang; ?>&region=USA" class="block px-4 py-2 text-xs hover:bg-slate-50 <?php echo $region === 'USA' ? 'text-primary font-bold' : ''; ?>">United States</a>
+                <a href="?page=<?php echo $page; ?>&lang=<?php echo $lang; ?>&region=MEX" class="block px-4 py-2 text-xs hover:bg-slate-50 <?php echo $region === 'MEX' ? 'text-primary font-bold' : ''; ?>">México</a>
+                <a href="?page=<?php echo $page; ?>&lang=<?php echo $lang; ?>&region=ESP" class="block px-4 py-2 text-xs hover:bg-slate-50 <?php echo $region === 'ESP' ? 'text-primary font-bold' : ''; ?>">España</a>
+            </div>
+        </div>
+
+        <!-- Language Switcher -->
             <div class="flex gap-2 mr-4">
                 <a href="?page=<?php echo $page; ?>&lang=en" class="px-2 py-1 text-xs font-bold rounded <?php echo $lang === 'en' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'; ?>">EN</a>
                 <a href="?page=<?php echo $page; ?>&lang=es" class="px-2 py-1 text-xs font-bold rounded <?php echo $lang === 'es' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'; ?>">ES</a>

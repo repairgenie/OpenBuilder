@@ -50,4 +50,22 @@ class Exporter {
         fclose($output);
         exit;
     }
+
+    public static function exportDrawing($drawing_id, $markups, $lang = 'en') {
+        // Simulation: Burn markups into PDF and force download
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="Drawing_'.$drawing_id.'_Marked.pdf"');
+        echo "%PDF-1.4 [Simulation of Drawing Export with ".count($markups)." markups]";
+        ActivityLog::log('System', 'Exported Drawing #'.$drawing_id.' with Markups', 'Exportó Plano #'.$drawing_id.' con Anotaciones', $drawing_id, 'drawings');
+        exit;
+    }
+
+    public static function generateAsBuilts($drawing_ids, $lang = 'en') {
+        // Simulation: Compile all drawings with final markups into a single ZIP/PDF
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="As-Built_Package_'.date('Y').'.zip"');
+        echo "[Simulation of As-Built Package with ".count($drawing_ids)." drawings]";
+        ActivityLog::log('System', 'Generated As-Built Package', 'Generó Paquete de Planos Conforme a Obra', count($drawing_ids), 'closeout');
+        exit;
+    }
 }

@@ -140,6 +140,116 @@ class AIProvider {
         return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
     }
 
+    public function generatePortfolioInsights($portfolio_data, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $context = json_encode($portfolio_data);
+        $prompt = ($lang === 'es')
+            ? "Analiza el rendimiento de esta cartera de construcción en ESPAÑOL: " . $context . ". Identifica los 3 proyectos con mayor riesgo y sugiere estrategias de mitigación."
+            : "Analyze the performance of this construction portfolio in ENGLISH: " . $context . ". Identify the 3 highest-risk projects and suggest mitigation strategies.";
+        
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
+    public function detectFinancialAnomalies($transactions, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $context = json_encode($transactions);
+        $prompt = ($lang === 'es')
+            ? "Analiza estas transacciones financieras en ESPAÑOL: " . $context . ". Identifica posibles anomalías, errores de facturación o riesgos de fraude."
+            : "Analyze these financial transactions in ENGLISH: " . $context . ". Identify potential anomalies, billing errors, or fraud risks.";
+        
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
+    public function generateSubmittalLog($spec_text, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $prompt = ($lang === 'es')
+            ? "Analiza este texto de especificación en ESPAÑOL y genera un registro de submittals requeridos. Para cada uno, identifica la sección y el tipo (ej. Planos de taller, Muestra)."
+            : "Analyze this spec text in ENGLISH and generate a required submittals log. For each, identify the section and type (e.g. Shop Drawings, Sample).";
+        
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
+    public function classifyPunchItem($description, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $prompt = ($lang === 'es')
+            ? "Clasifica esta deficiencia de construcción en ESPAÑOL: '" . $description . "'. Identifica la disciplina (ej. Pintura, Eléctrico) y asigna una prioridad."
+            : "Classify this construction deficiency in ENGLISH: '" . $description . "'. Identify the discipline (e.g. Painting, Electrical) and assign a priority.";
+        
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
+    public function predictOverruns($financial_data, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $context = json_encode($financial_data);
+        $prompt = ($lang === 'es')
+            ? "Predice el riesgo de sobrecostos en ESPAÑOL basado en estos datos financieros: " . $context . ". Identifica los códigos de costo más vulnerables."
+            : "Predict cost overrun risk in ENGLISH based on this financial data: " . $context . ". Identify the most vulnerable cost codes.";
+        
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
+    public function analyzeBids($bids_data, $lang = 'en') {
+        if (!$this->api_key) return "AI Key missing.";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key=" . $this->api_key;
+        $context = json_encode($bids_data);
+        $prompt = ($lang === 'es')
+            ? "Analiza estas ofertas de construcción en ESPAÑOL: " . $context . ". Identifica anomalías en los precios (demasiado altos o bajos) y sugiere al mejor proveedor basado en costo y valor."
+            : "Analyze these construction bids in ENGLISH: " . $context . ". Identify pricing anomalies (too high or too low) and suggest the best vendor based on cost and value.";
+        $body = ["contents" => [["parts" => [["text" => $prompt]]]]];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($res, true);
+        return $result['candidates'][0]['content']['parts'][0]['text'] ?? "Error.";
+    }
+
     private function getPrompt($notes, $weather, $lang) {
         $weather_context = $weather ? " The weather today was: " . $weather . "." : "";
         if ($lang === 'es') {
