@@ -36,7 +36,7 @@ function get_priority_color($p) {
             <div class="space-y-4">
                 <p class="text-slate-600">
                     <span class="font-bold text-black"><?php echo $lang === 'es' ? 'Fecha de Creación:' : 'Created Date:'; ?></span>
-                    <?php echo $rfi['created_at']; ?>
+                    <?php echo ($rfi['created_at'] ?? "N/A"); ?>
                 </p>
                 <div class="p-4 bg-slate-50 rounded border border-stroke italic text-slate-700">
                     <?php echo $lang === 'es' ? 'Por favor proporcione detalles sobre el espaciado de las varillas en el Sector A.' : 'Please provide details regarding the rebar spacing in Sector A.'; ?>

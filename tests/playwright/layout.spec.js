@@ -8,7 +8,7 @@ test('Modular Layout Verification', async ({ page }) => {
   
   // Verify Topbar
   await expect(page.locator('header.sticky')).toBeVisible();
-  await expect(page.locator('input[placeholder*="Search"]')).toBeVisible();
+  await expect(page.locator('input[name="search"]')).toBeVisible();
   
   // Verify Footer
   await expect(page.locator('footer')).toBeVisible();

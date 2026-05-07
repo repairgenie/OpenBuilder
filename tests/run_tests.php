@@ -27,10 +27,10 @@ function test_ai_provider_prompts() {
     $method = $reflector->getMethod('getPrompt');
     $method->setAccessible(true);
     
-    $prompt_en = $method->invokeArgs($ai, ['Testing notes', 'en']);
+    $prompt_en = $method->invokeArgs($ai, ['Testing notes', '', 'en']);
     assert(str_contains($prompt_en, 'ENGLISH'), "EN prompt should mention ENGLISH");
     
-    $prompt_es = $method->invokeArgs($ai, ['Notas de prueba', 'es']);
+    $prompt_es = $method->invokeArgs($ai, ['Notas de prueba', '', 'es']);
     assert(str_contains($prompt_es, 'ESPAÑOL'), "ES prompt should mention ESPAÑOL");
     
     echo "AIProvider tests PASSED.\n";

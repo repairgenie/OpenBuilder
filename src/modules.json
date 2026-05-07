@@ -1,0 +1,32 @@
+{
+    "dashboard": {
+        "enabled": true,
+        "name_en": "Dashboard",
+        "name_es": "Panel"
+    },
+    "rfis": {
+        "enabled": true,
+        "name_en": "RFIs",
+        "name_es": "RFIs"
+    },
+    "daily_logs": {
+        "enabled": true,
+        "name_en": "Daily Logs",
+        "name_es": "Diarios"
+    },
+    "budget": {
+        "enabled": true,
+        "name_en": "Budget",
+        "name_es": "Presupuesto"
+    },
+    "tasks": {
+        "enabled": true,
+        "name_en": "Tasks",
+        "name_es": "Tareas"
+    },
+    "admin": {
+        "enabled": true,
+        "name_en": "Admin",
+        "name_es": "Admin"
+    }
+}

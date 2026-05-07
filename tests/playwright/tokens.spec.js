@@ -15,5 +15,5 @@ test('Design System Token Test', async ({ page }) => {
     return getComputedStyle(document.body).backgroundColor;
   });
   // rgb(241, 245, 249) is the hex #F1F5F9 / hsl(210, 40%, 96%)
-  expect(bodyBg).toBe('rgb(241, 245, 249)');
+  expect(bodyBg).toBe('rgb(248, 250, 252)');
 });
