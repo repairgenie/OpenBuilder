@@ -1,14 +1,16 @@
 # Phase 2: Directory Restructuring
 
 ## Goal
-Organize the monolithic `index.php` into a more manageable MVC-like structure.
+Transition from a monolithic `index.php` to a structured directory system to support growth.
 
 ## Tasks
-1. [ ] Create `src/` for PHP logic (Controllers/Models).
-2. [ ] Create `public/` for static assets (CSS, JS, Images).
-3. [ ] Create `templates/` or `layouts/` for HTML fragments.
-4. [ ] Create `docs/` for Markdown content.
-5. [ ] **Biblia Checklist**: Update bilingual docs and testing guides.
+1. [ ] Create `src/` for logic.
+2. [ ] Create `public/` for assets.
+3. [ ] Create `layouts/` for templates.
+4. [ ] Create `docs/` for content.
 
-## Rationale
-Separation of concerns is essential for implementing complex features like a documentation engine.
+## Biblia Compliance
+- [ ] Update `docs/` (Bilingual).
+- [ ] Update `docs/testing-guide/`.
+- [ ] Update `docs/edge-testing/`.
+- [ ] Update Playwright scripts for path changes.

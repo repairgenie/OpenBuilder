@@ -1,11 +1,12 @@
-# Phase 9: Documentation Search (Client-Side)
+# Phase 9: Search UI Implementation
 
 ## Goal
-Implement a fast, searchable index of the documentation.
+Add a premium search bar to the navigation.
 
 ## Tasks
-1. [ ] Generate a `search.json` file containing titles and paths of all docs.
-2. [ ] Create a JS-based search filter for the UI.
+1. [ ] Create a searchable modal/dropdown.
+2. [ ] Implement fuzzy search in JS.
 
-## Rationale
-Search is a critical feature for any documentation site.
+## Biblia Compliance
+- [ ] Translate search placeholders and "no results" messages.
+- [ ] Test search functionality with Playwright.

@@ -1,13 +1,13 @@
-# Phase 4: Layout Refactoring
+# Phase 4: Base Styles & Reset
 
 ## Goal
-Break the HTML into reusable layout and partial files.
+Normalize browser styles and apply the core design system.
 
 ## Tasks
-1. [ ] Extract `<head>` and header into `layouts/header.php`.
-2. [ ] Extract sidebar into `layouts/sidebar.php`.
-3. [ ] Extract footer into `layouts/footer.php`.
-4. [ ] Implement a basic `render()` function to combine these.
+1. [ ] Create `public/css/base.css`.
+2. [ ] Implement a custom premium reset.
+3. [ ] Apply typography variables to global elements.
 
-## Rationale
-Reduces code duplication and makes it easier to update global UI elements.
+## Biblia Compliance
+- [ ] Update docs with the new style guide.
+- [ ] Test cross-browser compatibility.

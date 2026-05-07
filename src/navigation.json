@@ -1,0 +1,42 @@
+[
+    {
+        "title": { "en": "Dashboard", "es": "Panel" },
+        "path": "dashboard",
+        "icon": "dashboard"
+    },
+    {
+        "title": { "en": "Tasks", "es": "Tareas" },
+        "path": "tasks",
+        "icon": "tasks"
+    },
+    {
+        "title": { "en": "RFIs", "es": "Solicitudes" },
+        "path": "rfis",
+        "icon": "rfi"
+    },
+    {
+        "title": { "en": "Daily Logs", "es": "Diarios" },
+        "path": "daily_logs",
+        "icon": "log"
+    },
+    {
+        "title": { "en": "Budget", "es": "Presupuesto" },
+        "path": "budget",
+        "icon": "budget"
+    },
+    {
+        "title": { "en": "Users", "es": "Usuarios" },
+        "path": "users",
+        "icon": "users"
+    },
+    {
+        "title": { "en": "Settings", "es": "Ajustes" },
+        "path": "project_settings",
+        "icon": "settings"
+    },
+    {
+        "title": { "en": "Documentation", "es": "Documentación" },
+        "path": "docs",
+        "icon": "docs"
+    }
+]

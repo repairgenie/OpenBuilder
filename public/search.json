@@ -1,0 +1,50 @@
+[
+    {
+        "title": "Documentation Index",
+        "path": "index",
+        "lang": "en",
+        "url": "?page=docs&doc=index&lang=en"
+    },
+    {
+        "title": "Índice de Documentación",
+        "path": "index",
+        "lang": "es",
+        "url": "?page=docs&doc=index&lang=es"
+    },
+    {
+        "title": "Directory Structure",
+        "path": "structure",
+        "lang": "en",
+        "url": "?page=docs&doc=structure&lang=en"
+    },
+    {
+        "title": "Guía de Estructura de Directorios",
+        "path": "structure",
+        "lang": "es",
+        "url": "?page=docs&doc=structure&lang=es"
+    },
+    {
+        "title": "Design System",
+        "path": "design-system",
+        "lang": "en",
+        "url": "?page=docs&doc=design-system&lang=en"
+    },
+    {
+        "title": "Sistema de Diseño",
+        "path": "design-system",
+        "lang": "es",
+        "url": "?page=docs&doc=design-system&lang=es"
+    },
+    {
+        "title": "RFI API",
+        "path": "api/rfis",
+        "lang": "en",
+        "url": "?page=docs&doc=api/rfis&lang=en"
+    },
+    {
+        "title": "API de RFI",
+        "path": "api/rfis",
+        "lang": "es",
+        "url": "?page=docs&doc=api/rfis&lang=es"
+    }
+]

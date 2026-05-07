@@ -1,11 +1,12 @@
-# Phase 8: Navigation Data System
+# Phase 8: Search Index Generation (Search.json)
 
 ## Goal
-Drive the documentation sidebar from a central configuration file.
+Build a searchable index of the documentation.
 
 ## Tasks
-1. [ ] Create `docs/navigation.json` (or `.yml`).
-2. [ ] Implement a PHP function to parse this file and build the sidebar HTML.
+1. [ ] Create a PHP script to crawl `docs/` and generate `search.json`.
+2. [ ] Include titles and descriptions in both languages.
 
-## Rationale
-Matches the `_data/navigation.yml` feature from Procore, making navigation management easy.
+## Biblia Compliance
+- [ ] Ensure search index includes Spanish terms.
+- [ ] Update Edge Testing for indexing failures.

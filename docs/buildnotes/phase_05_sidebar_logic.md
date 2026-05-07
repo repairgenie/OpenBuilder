@@ -1,12 +1,13 @@
-# Phase 5: Sidebar Logic Modernization
+# Phase 5: Component System - Layout Partial Extraction
 
 ## Goal
-Make the sidebar dynamic and responsive, supporting nested items like Procore's docs.
+Modularize the HTML into reusable partials.
 
 ## Tasks
-1. [ ] Implement active state logic based on the current page.
-2. [ ] Add support for collapsible sections.
-3. [ ] Improve mobile responsiveness (hamburger menu).
+1. [ ] Extract `<head>` and Header into `layouts/header.php`.
+2. [ ] Extract Sidebar into `layouts/sidebar.php`.
+3. [ ] Extract Footer into `layouts/footer.php`.
 
-## Rationale
-Improves user navigation and provides a better experience for growing content.
+## Biblia Compliance
+- [ ] Ensure all partial labels are translated.
+- [ ] Verify partial loading in Playwright.

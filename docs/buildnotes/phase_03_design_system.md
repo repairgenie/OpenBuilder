@@ -1,13 +1,13 @@
-# Phase 3: Design System (Premium CSS)
+# Phase 3: Design Tokens & CSS Variables
 
 ## Goal
-Implement a robust CSS foundation inspired by Procore's clean developer aesthetics.
+Establish a design system foundation with bilingual-friendly labels.
 
 ## Tasks
-1. [ ] Define CSS Variables (Design Tokens) for colors, spacing, and typography.
-2. [ ] Implement a `reset.css` or base layer.
-3. [ ] Create a `design-system.css` with premium components (Cards, Buttons, Inputs).
-4. [ ] Integrate Google Fonts (Inter/Roboto).
+1. [ ] Create `public/css/variables.css`.
+2. [ ] Define HSL-based color palette (Primary, Success, Warning, Danger).
+3. [ ] Define spacing and typography scales.
 
-## Rationale
-A premium feel starts with a consistent and high-quality design system.
+## Biblia Compliance
+- [ ] Documentation of the design system in EN/ES.
+- [ ] Visual regression test script in Playwright.

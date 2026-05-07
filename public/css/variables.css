@@ -1,0 +1,67 @@
+/* public/css/variables.css - Design Tokens */
+
+:root {
+    /* Primary Palette - Premium Indigo */
+    --color-primary: hsl(231, 74%, 56%); /* #3C50E0 */
+    --color-primary-dark: hsl(231, 74%, 46%);
+    --color-danger-light: hsl(0, 75%, 96%);
+
+    /* Dark Mode Overrides */
+    --bg-body: hsl(210, 20%, 98%);
+    --bg-card: hsl(0, 0%, 100%);
+    --text-main: hsl(210, 20%, 15%);
+    --text-muted: hsl(210, 10%, 45%);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-body: hsl(210, 20%, 8%);
+        --bg-card: hsl(210, 20%, 12%);
+        --text-main: hsl(210, 20%, 95%);
+        --text-muted: hsl(210, 10%, 65%);
+        --stroke: hsl(210, 20%, 20%);
+    }
+}
+
+:root {
+    /* Branding & Semantic Colors */
+    --primary: hsl(230, 70%, 55%);
+    --primary-dark: hsl(230, 70%, 45%);
+    --secondary: hsl(200, 15%, 43%);
+    --accent: hsl(35, 90%, 55%);
+    --success: hsl(150, 60%, 45%);
+    --warning: hsl(35, 90%, 55%);
+    --danger: hsl(0, 75%, 60%);
+
+    /* Functional Colors */
+    --color-success: hsl(145, 63%, 36%); /* #219653 */
+    --color-warning: hsl(28, 87%, 62%); /* #F2994A */
+    --color-danger: hsl(352, 63%, 54%); /* #D34053 */
+
+    /* Neutrals - Dark Mode Ready */
+    --color-body-bg: hsl(210, 40%, 96%); /* #F1F5F9 */
+    --color-text-main: hsl(215, 25%, 27%); /* #slate-800 */
+    --color-text-muted: hsl(215, 16%, 47%); /* #slate-500 */
+    --color-stroke: hsl(214, 32%, 91%); /* #E2E8F0 */
+    --color-white: hsl(0, 0%, 100%);
+    --color-black: hsl(222, 47%, 11%); /* #slate-900 */
+
+    /* Glassmorphism Defaults */
+    --glass-bg: hsla(0, 0%, 100%, 0.7);
+    --glass-border: hsla(0, 0%, 100%, 0.3);
+    --glass-blur: 10px;
+
+    /* Spacing Scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+
+    /* Shadow Scale */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
