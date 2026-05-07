@@ -9,11 +9,11 @@ test('Mobile Menu Verification', async ({ page }) => {
   const toggle = page.locator('#mobile-toggle');
   
   // Verify sidebar is hidden initially on mobile
-  await expect(sidebar).toHaveClass(/translate-x-full/);
+  await expect(sidebar).toHaveClass(/-translate-x-full/);
   
   // Toggle menu
   await toggle.click();
-  await expect(sidebar).not.toHaveClass(/translate-x-full/);
+  await expect(sidebar).not.toHaveClass(/-translate-x-full/);
   
   // Verify overlay
   const overlay = page.locator('#sidebar-overlay');
@@ -21,5 +21,5 @@ test('Mobile Menu Verification', async ({ page }) => {
   
   // Close via overlay
   await overlay.click();
-  await expect(sidebar).toHaveClass(/translate-x-full/);
+  await expect(sidebar).toHaveClass(/-translate-x-full/);
 });

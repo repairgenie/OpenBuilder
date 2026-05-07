@@ -55,6 +55,7 @@ test.describe('OpenBuilder Full Suite - Advanced Features', () => {
     await page.goto('/index.php?page=project_settings&lang=en');
     await page.fill('input[value="OpenBuilder HQ"]', 'Updated Project Name');
     await page.click('button:has-text("Save Changes")');
+    await expect(page.locator('.toast')).toBeVisible();
     await expect(page.locator('.toast')).toContainText('Settings saved');
   });
 
@@ -72,7 +73,7 @@ test.describe('OpenBuilder Full Suite - Advanced Features', () => {
     await expect(inputs).toHaveCount(6);
     
     await page.click('button:has-text("Verify")');
-    await expect(page.url()).toContain('page=dashboard');
+    await expect(page).toHaveURL(/page=dashboard/);
   });
 
   // 6. Mobile Usability

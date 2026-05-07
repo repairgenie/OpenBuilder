@@ -3,6 +3,7 @@ const { test, expect } = require('@playwright/test');
 test('Design System Token Test', async ({ page }) => {
   await page.goto('http://localhost:8000');
   
+  await page.waitForLoadState('networkidle');
   // Verify that a CSS variable is accessible
   const primaryColor = await page.evaluate(() => {
     return getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
