@@ -23,7 +23,7 @@ class AIProvider {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-'Authorization: Bearer ' . $this->api_key
+'Authorization: Bearer ' . $this->api_key,
             ],
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $body,
