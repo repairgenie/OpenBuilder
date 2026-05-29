@@ -7,6 +7,7 @@
 
 <div class="card">
     <form action="index.php?lang=<?php echo $lang; ?>" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
         <input type="hidden" name="action" value="create_cost_code">
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>

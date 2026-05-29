@@ -24,4 +24,24 @@ class Storage {
         }
         return "https://cloud-storage-simulation.com/" . $path;
     }
+
+    public static function store($tmp_name, $original_name, $folder = 'documents') {
+        $ext = pathinfo($original_name, PATHINFO_EXTENSION);
+        $basename = pathinfo($original_name, PATHINFO_FILENAME);
+        $stored_name = $basename . '_' . time() . '.' . $ext;
+        $relative_path = $folder . '/' . $stored_name;
+        $full_path = __DIR__ . '/../storage/' . $relative_path;
+        $dir = dirname($full_path);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        if (self::$driver === 'local') {
+            if (move_uploaded_file($tmp_name, $full_path)) {
+                return ['path' => $relative_path, 'url' => self::getUrl($relative_path)];
+            }
+            return null;
+        }
+
+        error_log("Simulating Cloud Store to " . self::$driver . " for $folder/$stored_name");
+        return ['path' => $relative_path, 'url' => "https://cloud-storage-simulation.com/$relative_path"];
+    }
 }

@@ -1,0 +1,380 @@
+{
+  "audit_date": "2026-05-28",
+  "files_audited": 24,
+  "findings": [
+    {
+      "file": "templates/inspection_schedule.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/inspection_schedule.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": ["No permission checks in this stub/partial"] },
+      "hardcoded_mock_data": [
+        { "line": 21, "data": "Pre-Pour Check" },
+        { "line": 26, "data": "Safety Walk" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/inspection_execution.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/inspection_execution.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 4, "data": "Level 2" },
+        { "line": 6, "data": "ID: INS-102" },
+        { "line": 8, "data": "Pre-Concrete Pour Checklist" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/punch_list_v2.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/punch_list_v2.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 22, "data": "Level 1, Lobby" },
+        { "line": 23, "data": "Level 2, Corridor" },
+        { "line": 43, "data": "PL-001" },
+        { "line": 45, "data": "Scuff marks on north wall" },
+        { "line": 46, "data": "Painter • Level 2" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/drawings_v2.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/drawings_v2.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 30, "data": "https://images.unsplash.com/photo-1503387762-592deb58ef4e - Drawing thumbnail" },
+        { "line": 34, "data": "A-101 Floor Plan - Level 1" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/safety_hazards.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/safety_hazards.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 11, "data": "Immediate Danger" },
+        { "line": 12, "data": "SH-012" },
+        { "line": 14, "data": "Missing Perimeter Guardrails" },
+        { "line": 15, "data": "Location: Level 4, North Face" },
+        { "line": 22, "data": "Safety Officer" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/quality_analytics.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/quality_analytics.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 25, "data": "Chart data: [85, 10, 5] Pass/Fail/N/A percentages" },
+        { "line": 35, "data": "Chart data: [5, 12, 3, 8] Failures by discipline" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/portfolio_dashboard.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/portfolio_dashboard.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 10, "data": "12 - Active Projects count" },
+        { "line": 14, "data": "$85.4M - Total Portfolio Value" },
+        { "line": 18, "data": "14.2% - Avg. Margin" },
+        { "line": 22, "data": "3 - Safety Incidents YTD" },
+        { "line": 36, "data": "['Hotel A', 'Office B', 'Mall C', 'Apts D'] - Project names" },
+        { "line": 39, "data": "Budget/Actual chart data: [12, 18, 25, 10] / [12.4, 17.5, 26.2, 9.8]" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/financial_forecast.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/financial_forecast.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 10, "data": "$598,000 - Committed amount" },
+        { "line": 14, "data": "$45,200 - Pending Changes" },
+        { "line": 18, "data": "$643,200 - Final Forecast" },
+        { "line": 35, "data": "Chart data: [600000, 615000, 643200]" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/digital_signature.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/digital_signature.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/progress_claims.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/progress_claims.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 19, "data": "INV-012" },
+        { "line": 20, "data": "SteelWorks LLC" },
+        { "line": 21, "data": "$42,500.00" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/direct_costs.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/direct_costs.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 23, "data": "Nov 02, 2023" },
+        { "line": 25, "data": "Site Office Supplies" },
+        { "line": 26, "data": "OfficeMax" },
+        { "line": 28, "data": "$125.40" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/distribution_lists.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/distribution_lists.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 12, "data": "Architectural Review Team" },
+        { "line": 13, "data": "John Doe, Jane Smith" },
+        { "line": 20, "data": "Project Stakeholders (Owner)" },
+        { "line": 21, "data": "Robert Brown" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/funding_sources.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/funding_sources.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 16, "data": "Commercial Construction Loan" },
+        { "line": 21, "data": "$5,000,000 - Total Facility" },
+        { "line": 22, "data": "$1,245,000 - Drawn Amount" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/resource_management.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/resource_management.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 19, "data": "John Doe - Superintendent" },
+        { "line": 22, "data": "Hotel Plaza Extension - 95% workload" },
+        { "line": 34, "data": "Jane Smith - Safety Officer" },
+        { "line": 37, "data": "Downtown Office Park - 60% workload" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/crew_management.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/crew_management.php",
+      "native_dialogs": [
+        { "line": 236, "type": "confirm()", "context": "removeMember function" },
+        { "line": 247, "type": "confirm()", "context": "confirmDeleteCrew function" }
+      ],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["CSRF token present on forms at lines 145, 190, 240, 251"] },
+      "permission_helper": { "initialized": false, "notes": ["No PermissionHelper initialization - fetches from DB directly"] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": ["native_confirm_dialogs"], "compliant": false }
+    },
+    {
+      "file": "templates/region_config.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/region_config.php",
+      "native_dialogs": [
+        { "line": 212, "type": "confirm()", "context": "deleteRegion function" }
+      ],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["CSRF token present on forms at lines 101, 161, 205, 220"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": ["native_confirm_dialogs"], "compliant": false }
+    },
+    {
+      "file": "templates/create_cost_code.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/create_cost_code.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": false, "notes": ["POST form at line 9 missing csrf_token field"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": ["missing_csrf"], "compliant": false }
+    },
+    {
+      "file": "templates/create_daily_log.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/create_daily_log.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": false, "notes": ["POST form at line 14 missing csrf_token field"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": ["missing_csrf"], "compliant": false }
+    },
+    {
+      "file": "templates/create_rfi.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/create_rfi.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": false, "notes": ["Line 3: Mixed language 'Create New RFI / Crear Nueva RFI' without conditional", "Lines 10,14,19,24: Labels use 'Subject / Asunto' format without $lang check", "Lines 25-27: Select options use mixed 'Low / Baja' format"] },
+      "csrf_fields": { "compliant": false, "notes": ["POST form at line 6 missing csrf_token field"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [],
+      "biblia_compliance": { "issues": ["missing_bilingual_toggle", "missing_csrf"], "compliant": false }
+    },
+    {
+      "file": "templates/bid_comparison.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/bid_comparison.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 4, "data": "Package: Drywall & Framing" },
+        { "line": 20, "data": "A-1 Drywall - $125,000.00" },
+        { "line": 26, "data": "Precision Framing - $142,500.00" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/bid_history.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/bid_history.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 19, "data": "['Proj A', 'Proj B', 'Proj C', 'Current']" },
+        { "line": 22, "data": "[5.20, 5.45, 5.10, 5.60] - Cost/SF data" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/closeout_docs.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/closeout_docs.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 19, "data": "HVAC System Warranty - AirTech Inc. - Dec 31" },
+        { "line": 33, "data": "Elevator Ops Manual - Vertical Lift - Oct 12" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/commitments.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/commitments.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 25, "data": "SC-001" },
+        { "line": 27, "data": "Structural Steel Fabrication" },
+        { "line": 30, "data": "SteelWorks LLC" },
+        { "line": 31, "data": "$245,000.00" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    },
+    {
+      "file": "templates/change_management.php",
+      "path": "/home/george/Documents/GitHub/OpenBuilder/templates/change_management.php",
+      "native_dialogs": [],
+      "bilingual_toggle": { "compliant": true, "notes": [] },
+      "csrf_fields": { "compliant": true, "notes": ["No POST forms present"] },
+      "permission_helper": { "initialized": false, "notes": [] },
+      "hardcoded_mock_data": [
+        { "line": 32, "data": "PCO-001 - Foundation Redesign - $12,450.00" },
+        { "line": 41, "data": "PCO-002 - Electrical Upgrade - Lobby - $8,200.00" }
+      ],
+      "biblia_compliance": { "issues": [], "compliant": true }
+    }
+  ],
+  "navigation_orphaned_files": [
+    "inspection_schedule.php",
+    "inspection_execution.php",
+    "punch_list_v2.php",
+    "drawings_v2.php",
+    "safety_hazards.php",
+    "quality_analytics.php",
+    "portfolio_dashboard.php",
+    "financial_forecast.php",
+    "digital_signature.php",
+    "progress_claims.php",
+    "direct_costs.php",
+    "distribution_lists.php",
+    "funding_sources.php",
+    "resource_management.php",
+    "create_cost_code.php",
+    "create_daily_log.php",
+    "create_rfi.php",
+    "bid_comparison.php",
+    "bid_history.php",
+    "closeout_docs.php",
+    "change_management.php"
+  ],
+  "navigation_json_items": [
+    "dashboard",
+    "tasks",
+    "daily_logs",
+    "rfis",
+    "crew_management",
+    "submittals",
+    "budget",
+    "commitments",
+    "vendor_portal",
+    "region_config",
+    "users",
+    "roles",
+    "api_keys",
+    "project_settings",
+    "notification_prefs",
+    "audit_logs"
+  ],
+  "summary": {
+    "total_files": 24,
+    "biblia_compliant": 19,
+    "biblia_non_compliant": 5,
+    "native_dialog_violations": 3,
+    "csrf_violations": 3,
+    "bilingual_toggle_violations": 1,
+    "orphaned_files_not_in_nav": 21,
+    "all_files_have_hardcoded_data": true
+  }
+}

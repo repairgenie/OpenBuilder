@@ -16,6 +16,7 @@ set_exception_handler(function($e) {
 require_once __DIR__ . '/src/app.php';
 
 $page = $_GET['page'] ?? 'dashboard';
+$lang = $_GET['lang'] ?? 'en';
 
 // Include Header
 include_once __DIR__ . '/layouts/header.php';

@@ -4,12 +4,20 @@
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/AIProvider.php';
 require_once __DIR__ . '/ModuleRegistry.php';
+require_once __DIR__ . '/security_helper.php';
 
 // Initialize System
 ModuleRegistry::init();
 $pdo = Database::connect();
 
 $page = $_GET['page'] ?? 'dashboard';
+
+// Protected pages require auth
+$public_pages = ['dashboard', 'login', 'login_handler', 'mfa', 'mfa_handler', 'docs', 'health', 'api_handler'];
+if (!in_array($page, $public_pages)) {
+    require_auth();
+}
+
 $lang = $_GET['lang'] ?? 'en';
 if (!in_array($lang, ['en', 'es'])) $lang = 'en';
 
@@ -26,7 +34,12 @@ $page_titles = [
     'budget' => ['en' => 'Budget', 'es' => 'Presupuesto'],
     'docs' => ['en' => 'Docs', 'es' => 'Docs'],
     'project_settings' => ['en' => 'Settings', 'es' => 'Ajustes'],
+    'notification_prefs' => ['en' => 'Notification Preferences', 'es' => 'Preferencias de Notificación'],
     'audit_logs' => ['en' => 'Audit Logs', 'es' => 'Auditoría'],
+    'users' => ['en' => 'User Management', 'es' => 'Gestión de Usuarios'],
+    'roles' => ['en' => 'Roles & Permissions', 'es' => 'Roles y Permisos'],
+    'api_keys' => ['en' => 'API Keys', 'es' => 'Claves API'],
+    'api_handler' => ['en' => 'API Handler', 'es' => 'Gestor API'],
     'mfa' => ['en' => 'MFA', 'es' => 'MFA'],
 ];
 
@@ -58,7 +71,7 @@ function calculate_budget_metrics($code) {
 }
 
 function paginate_results($pdo, $query, $params = [], $per_page = 5) {
-    $p = $_GET['p'] ?? 1;
+    $p = max(1, (int)($_GET['p'] ?? 1));
     $offset = ($p - 1) * $per_page;
     $count_query = preg_replace('/SELECT (.*) FROM/i', 'SELECT COUNT(*) FROM', $query);
     $count_query = preg_replace('/ORDER BY (.*)/i', '', $count_query);
@@ -82,6 +95,11 @@ function paginate_results($pdo, $query, $params = [], $per_page = 5) {
 
 // Handle Form Submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if (!csrf_validate()) {
+        header("HTTP/1.1 403 Forbidden");
+        echo json_encode(['success' => false, 'error' => 'CSRF validation failed']);
+        exit;
+    }
     switch ($_POST['action']) {
         case 'create_rfi':
             $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date) VALUES (:ref_number, :subject, :status, :priority, :due_date)");
@@ -96,15 +114,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
 
         case 'create_daily_log':
+            $lat = isset($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+            $lon = isset($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+            $gps_stamp = GPSEngine::formatStamp($lat, $lon);
             $ai = new AIProvider(getenv('GEMINI_API_KEY'));
             $ai_report = $ai->generateReport($_POST['work_performed'] ?? '', $_POST['weather'] ?? '', $lang);
-            $stmt = $pdo->prepare("INSERT INTO daily_logs (log_date, weather, manpower, work_performed, ai_report) VALUES (:log_date, :weather, :manpower, :work_performed, :ai_report)");
+            $stmt = $pdo->prepare("INSERT INTO daily_logs (log_date, weather, manpower, work_performed, ai_report, latitude, longitude, gps_stamp) VALUES (:log_date, :weather, :manpower, :work_performed, :ai_report, :latitude, :longitude, :gps_stamp)");
             $stmt->execute([
                 ':log_date' => $_POST['log_date'] ?? '',
                 ':weather' => $_POST['weather'] ?? '',
                 ':manpower' => $_POST['manpower'] ?? 0,
                 ':work_performed' => $_POST['work_performed'] ?? '',
-                ':ai_report' => $ai_report
+                ':ai_report' => $ai_report,
+                ':latitude' => $lat,
+                ':longitude' => $lon,
+                ':gps_stamp' => $gps_stamp
             ]);
             header("Location: index.php?page=view_daily_log&id=" . $pdo->lastInsertId() . "&lang=$lang");
             exit;
@@ -123,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Handle Exports
 if (isset($_GET['action'])) {
+    require_auth();
     require_once __DIR__ . '/Exporter.php';
     if ($_GET['action'] === 'export_rfis') {
         $stmt = $pdo->query("SELECT * FROM rfis ORDER BY id DESC");

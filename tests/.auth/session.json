@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "ob_test_mode",
+      "value": "1",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "PHPSESSID",
+      "value": "rsig34s8j94rsi905n8grpctd3",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "timestamp": 1780080978427
+}

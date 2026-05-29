@@ -4,7 +4,7 @@
     "group_es": "Núcleo",
     "items": [
       { "id": "dashboard", "name_en": "Dashboard", "name_es": "Panel", "icon": "grid" },
-      { "id": "tasks", "name_en": "Tasks", "name_es": "Tareas", "icon": "check-square" }
+      { "id": "tasks", "name_en": "Task Scheduling", "name_es": "Programación de Tareas", "icon": "check-square" }
     ]
   },
   {
@@ -12,21 +12,46 @@
     "group_es": "Gestión de Campo",
     "items": [
       { "id": "daily_logs", "name_en": "Daily Logs", "name_es": "Diarios", "icon": "book" },
-      { "id": "rfis", "name_en": "RFIs", "name_es": "RFIs", "icon": "help-circle" }
+      { "id": "rfis", "name_en": "RFIs", "name_es": "RFIs", "icon": "help-circle" },
+      { "id": "crew_management", "name_en": "Crew Management", "name_es": "Cuadrillas", "icon": "users" },
+      { "id": "submittals", "name_en": "Submittals", "name_es": "Entregables", "icon": "file" },
+      { "id": "timesheets", "name_en": "Timesheets", "name_es": "Partes de Horas", "icon": "clock" },
+      { "id": "equipment", "name_en": "Equipment", "name_es": "Equipo", "icon": "truck" },
+      { "id": "safety_hazards", "name_en": "Safety Hazards", "name_es": "Peligros de Seguridad", "icon": "alert-triangle" },
+      { "id": "punch_list_v2", "name_en": "Punch List", "name_es": "Lista de Punch", "icon": "check-square" },
+      { "id": "inspections", "name_en": "Inspections", "name_es": "Inspecciones", "icon": "clipboard" },
+      { "id": "observations", "name_en": "Observations", "name_es": "Observaciones", "icon": "eye" },
+      { "id": "media", "name_en": "Media", "name_es": "Medios", "icon": "camera" }
     ]
   },
   {
     "group_en": "Financials",
     "group_es": "Finanzas",
     "items": [
-      { "id": "budget", "name_en": "Budget", "name_es": "Presupuesto", "icon": "dollar-sign" }
+      { "id": "budget", "name_en": "Budget", "name_es": "Presupuesto", "icon": "dollar-sign" },
+      { "id": "commitments", "name_en": "Commitments", "name_es": "Compromisos", "icon": "file-text" },
+      { "id": "prime_contracts", "name_en": "Prime Contracts", "name_es": "Contratos Prime", "icon": "briefcase" },
+      { "id": "change_orders", "name_en": "Change Orders", "name_es": "Órdenes de Cambio", "icon": "file-plus" },
+      { "id": "vendor_portal", "name_en": "Vendors", "name_es": "Proveedores", "icon": "truck" }
+    ]
+  },
+  {
+    "group_en": "Configuration",
+    "group_es": "Configuración",
+    "items": [
+      { "id": "region_config", "name_en": "Regions", "name_es": "Regiones", "icon": "map" },
+      { "id": "docs", "name_en": "Documents", "name_es": "Documentos", "icon": "file-text" }
     ]
   },
   {
     "group_en": "Admin",
     "group_es": "Admin",
     "items": [
+      { "id": "users", "name_en": "Users", "name_es": "Usuarios", "icon": "users" },
+      { "id": "roles", "name_en": "Roles", "name_es": "Roles", "icon": "shield" },
+      { "id": "api_keys", "name_en": "API Keys", "name_es": "Claves API", "icon": "key" },
       { "id": "project_settings", "name_en": "Settings", "name_es": "Ajustes", "icon": "settings" },
+      { "id": "notification_prefs", "name_en": "Notifications", "name_es": "Notificaciones", "icon": "bell" },
       { "id": "audit_logs", "name_en": "Audit Logs", "name_es": "Auditoría", "icon": "list" }
     ]
   }

@@ -4,13 +4,13 @@
 class WeatherProvider {
     public function getWeather($lang = 'en') {
         // Simulated weather data
-        $temp = rand(65, 85);
+        $temp = random_int(65, 85);
         $conditions = [
             'en' => ['Sunny', 'Partly Cloudy', 'Overcast', 'Light Rain'],
             'es' => ['Soleado', 'Parcialmente Nublado', 'Nublado', 'Lluvia Ligera']
         ];
         
-        $idx = rand(0, 3);
+        $idx = random_int(0, 3);
         return [
             'temp' => $temp,
             'condition' => $conditions[$lang][$idx],

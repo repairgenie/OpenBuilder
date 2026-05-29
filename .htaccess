@@ -1,0 +1,11 @@
+# OpenBuilder htaccess
+RewriteEngine On
+
+# API routing
+RewriteRule ^api/(.*)$ src/api/project_api.php [L,QSA]
+
+# Deny access to sensitive files
+<FilesMatch "\.(sqlite|md|yml|yaml|json|log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
