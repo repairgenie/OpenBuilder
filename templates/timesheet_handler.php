@@ -36,7 +36,7 @@ switch ($action) {
         $latitude = !empty($_POST['latitude']) ? (float)$_POST['latitude'] : null;
         $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
         $gps_stamp = GPSEngine::formatStamp($latitude, $longitude);
-        $created_by = (int)($_POST['created_by'] ?? 0);
+        $created_by = $_SESSION['user_id'];
 
         if (!$worker_name || !$trade_en || !$trade_es || !$hours || !$date) {
             $_SESSION['flash_error'] = $lang === 'es' ? 'Todos los campos requeridos deben completarse.' : 'All required fields must be completed.';
@@ -60,6 +60,14 @@ switch ($action) {
 
     case 'update_timesheet':
         $id = (int)($_POST['id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT * FROM timesheets WHERE id=?");
+        $stmt->execute([$id]);
+        $ts = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$ts || ($ts['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
         $worker_name = trim($_POST['worker_name'] ?? '');
         $trade_en = trim($_POST['trade_en'] ?? '');
         $trade_es = trim($_POST['trade_es'] ?? '');
@@ -113,14 +121,22 @@ switch ($action) {
 
     case 'approve_timesheet':
         $id = (int)($_POST['id'] ?? 0);
-        if ($id > 0) {
-            $pdo->prepare("UPDATE timesheets SET status='Approved' WHERE id=?")->execute([$id]);
-
-            $user_name = $_SESSION['user_name'] ?? 'System';
-            log_activity("Approved timesheet", "Aprobó parte de horas", 'timesheets', $id);
-
-            $_SESSION['flash_success'] = $lang === 'es' ? 'Parte aprobado.' : 'Timesheet approved.';
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header("Location: $base");
+            exit;
         }
+        $stmt = $pdo->prepare("SELECT * FROM timesheets WHERE id=?");
+        $stmt->execute([$id]);
+        $ts = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$ts) {
+            $_SESSION['flash_error'] = 'Timesheet not found.';
+            header("Location: $base");
+            exit;
+        }
+        $pdo->prepare("UPDATE timesheets SET status='Approved' WHERE id=?")->execute([$id]);
+        log_activity("Approved timesheet", "Aprobó parte de horas", 'timesheets', $id);
+        $_SESSION['flash_success'] = $lang === 'es' ? 'Parte aprobado.' : 'Timesheet approved.';
         header("Location: $base");
         exit;
 

@@ -40,8 +40,8 @@ switch ($action) {
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO submittals (title_en, title_es, spec_section, status, ball_in_court, due_date, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))");
-            $stmt->execute([$title_en, $title_es, $spec_section, $status, $ball_in_court, $due_date]);
+            $stmt = $pdo->prepare("INSERT INTO submittals (title_en, title_es, spec_section, status, ball_in_court, due_date, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))");
+            $stmt->execute([$title_en, $title_es, $spec_section, $status, $ball_in_court, $due_date, $_SESSION['user_id']]);
             $new_id = $pdo->lastInsertId();
 
             $user = $_SESSION['user_name'] ?? 'System';
@@ -69,6 +69,15 @@ switch ($action) {
             exit;
         }
 
+        $stmt = $pdo->prepare("SELECT * FROM submittals WHERE id=?");
+        $stmt->execute([$id]);
+        $sub = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$sub || ($sub['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+
         try {
             $stmt = $pdo->prepare("UPDATE submittals SET title_en=?, title_es=?, spec_section=?, status=?, ball_in_court=?, due_date=? WHERE id=?");
             $stmt->execute([$title_en, $title_es, $spec_section, $status, $ball_in_court, $due_date, $id]);
@@ -85,18 +94,26 @@ switch ($action) {
 
     case 'delete_submittal':
         $id = (int)($_POST['id'] ?? 0);
-        if ($id > 0) {
-            $stmt = $pdo->prepare("SELECT title_en FROM submittals WHERE id=?");
-            $stmt->execute([$id]);
-            $title = $stmt->fetchColumn() ?: "ID:$id";
-
-            $pdo->prepare("DELETE FROM submittals WHERE id=?")->execute([$id]);
-
-            $user = $_SESSION['user_name'] ?? 'System';
-            ActivityLog::log($user, "Deleted submittal: $title", "Eliminó submittal: $title", $id, 'submittals');
-
-            $_SESSION['flash_success'] = $lang === 'es' ? 'Submittal eliminado.' : 'Submittal deleted.';
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header("Location: $base");
+            exit;
         }
+        $stmt = $pdo->prepare("SELECT * FROM submittals WHERE id=?");
+        $stmt->execute([$id]);
+        $sub = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$sub || ($sub['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+        $title = $sub['title_en'] ?? "ID:$id";
+        $pdo->prepare("DELETE FROM submittals WHERE id=?")->execute([$id]);
+
+        $user = $_SESSION['user_name'] ?? 'System';
+        ActivityLog::log($user, "Deleted submittal: $title", "Eliminó submittal: $title", $id, 'submittals');
+
+        $_SESSION['flash_success'] = $lang === 'es' ? 'Submittal eliminado.' : 'Submittal deleted.';
         header("Location: $base");
         exit;
 

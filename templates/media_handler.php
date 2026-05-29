@@ -34,7 +34,7 @@ switch ($action) {
         $dest_path = $upload_dir . uniqid() . '_' . $safe_filename;
         move_uploaded_file($file['tmp_name'], $dest_path);
 
-        $stmt = $pdo->prepare("INSERT INTO media (filename, title, project_id, cost_code_id, date_taken, tags, file_path, file_size, mime_type, uploaded_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
+        $stmt = $pdo->prepare("INSERT INTO media (filename, title, project_id, cost_code_id, date_taken, tags, file_path, file_size, mime_type, uploaded_by, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
             $filename,
             $_POST['title'] ?: $filename,
@@ -45,19 +45,31 @@ switch ($action) {
             $dest_path,
             $file['size'],
             $file['type'],
-            $_POST['uploaded_by']
+            $_SESSION['user_id'],
+            $_SESSION['user_id']
         ]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Medio subido exitosamente.' : 'Media uploaded successfully.';
         break;
 
     case 'delete_media':
-        $stmt = $pdo->prepare("SELECT file_path FROM media WHERE id=?");
-        $stmt->execute([$_POST['id']]);
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header($redirect);
+            exit;
+        }
+        $stmt = $pdo->prepare("SELECT * FROM media WHERE id=?");
+        $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row || ($row['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
         if ($row && file_exists($row['file_path'])) {
             unlink($row['file_path']);
         }
-        $pdo->prepare("DELETE FROM media WHERE id=?")->execute([$_POST['id']]);
+        $pdo->prepare("DELETE FROM media WHERE id=?")->execute([$id]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Medio eliminado.' : 'Media deleted.';
         break;
 

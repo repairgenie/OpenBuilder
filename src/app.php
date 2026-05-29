@@ -95,31 +95,38 @@ function paginate_results($pdo, $query, $params = [], $per_page = 5) {
 
 // Handle Form Submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if (!csrf_validate()) {
+    require_auth();
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!csrf_valid($csrf)) {
         header("HTTP/1.1 403 Forbidden");
         echo json_encode(['success' => false, 'error' => 'CSRF validation failed']);
         exit;
     }
     switch ($_POST['action']) {
         case 'create_rfi':
-            $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date) VALUES (:ref_number, :subject, :status, :priority, :due_date)");
+            $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date, created_by) VALUES (:ref_number, :subject, :status, :priority, :due_date, :created_by)");
             $stmt->execute([
                 ':ref_number' => $_POST['ref_number'] ?? '',
                 ':subject' => $_POST['subject'] ?? '',
                 ':status' => $_POST['status'] ?? 'Open',
                 ':priority' => $_POST['priority'] ?? 'Medium',
-                ':due_date' => $_POST['due_date'] ?? ''
+                ':due_date' => $_POST['due_date'] ?? '',
+                ':created_by' => $_SESSION['user_id']
             ]);
             header("Location: index.php?page=rfis&lang=$lang");
             exit;
 
         case 'create_daily_log':
+            if (!isset($_SESSION['user_id'])) {
+                header("HTTP/1.1 403 Forbidden");
+                exit;
+            }
             $lat = isset($_POST['latitude']) ? floatval($_POST['latitude']) : null;
             $lon = isset($_POST['longitude']) ? floatval($_POST['longitude']) : null;
             $gps_stamp = GPSEngine::formatStamp($lat, $lon);
             $ai = new AIProvider(getenv('GEMINI_API_KEY'));
             $ai_report = $ai->generateReport($_POST['work_performed'] ?? '', $_POST['weather'] ?? '', $lang);
-            $stmt = $pdo->prepare("INSERT INTO daily_logs (log_date, weather, manpower, work_performed, ai_report, latitude, longitude, gps_stamp) VALUES (:log_date, :weather, :manpower, :work_performed, :ai_report, :latitude, :longitude, :gps_stamp)");
+            $stmt = $pdo->prepare("INSERT INTO daily_logs (log_date, weather, manpower, work_performed, ai_report, latitude, longitude, gps_stamp, created_by) VALUES (:log_date, :weather, :manpower, :work_performed, :ai_report, :latitude, :longitude, :gps_stamp, :created_by)");
             $stmt->execute([
                 ':log_date' => $_POST['log_date'] ?? '',
                 ':weather' => $_POST['weather'] ?? '',
@@ -128,17 +135,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 ':ai_report' => $ai_report,
                 ':latitude' => $lat,
                 ':longitude' => $lon,
-                ':gps_stamp' => $gps_stamp
+                ':gps_stamp' => $gps_stamp,
+                ':created_by' => $_SESSION['user_id']
             ]);
             header("Location: index.php?page=view_daily_log&id=" . $pdo->lastInsertId() . "&lang=$lang");
             exit;
 
         case 'create_cost_code':
-            $stmt = $pdo->prepare("INSERT INTO cost_codes (code, name, original_budget) VALUES (:code, :name, :original_budget)");
+            $stmt = $pdo->prepare("INSERT INTO cost_codes (code, name, original_budget, created_by) VALUES (:code, :name, :original_budget, :created_by)");
             $stmt->execute([
                 ':code' => $_POST['code'] ?? '',
                 ':name' => $_POST['name'] ?? '',
-                ':original_budget' => $_POST['original_budget'] ?? 0
+                ':original_budget' => $_POST['original_budget'] ?? 0,
+                ':created_by' => $_SESSION['user_id']
             ]);
             header("Location: index.php?page=budget&lang=$lang");
             exit;

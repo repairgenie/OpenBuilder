@@ -38,8 +38,8 @@ switch ($action) {
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO crews (name, trade_en, trade_es, status, created_at) VALUES (?, ?, ?, ?, datetime('now'))");
-            $stmt->execute([$name, $trade_en, $trade_es, $status]);
+            $stmt = $pdo->prepare("INSERT INTO crews (name, trade_en, trade_es, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))");
+            $stmt->execute([$name, $trade_en, $trade_es, $status, $_SESSION['user_id']]);
             $new_id = $pdo->lastInsertId();
 
             $user = $_SESSION['user_name'] ?? 'System';
@@ -65,6 +65,15 @@ switch ($action) {
             exit;
         }
 
+        $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
+        $stmt->execute([$id]);
+        $crew = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+
         try {
             $stmt = $pdo->prepare("UPDATE crews SET name=?, trade_en=?, trade_es=?, status=? WHERE id=?");
             $stmt->execute([$name, $trade_en, $trade_es, $status, $id]);
@@ -81,21 +90,28 @@ switch ($action) {
 
     case 'delete_crew':
         $id = (int)($_POST['id'] ?? 0);
-        if ($id > 0) {
-            // Delete crew members first
-            $pdo->prepare("DELETE FROM crew_members WHERE crew_id=?")->execute([$id]);
-            
-            $stmt = $pdo->prepare("SELECT name FROM crews WHERE id=?");
-            $stmt->execute([$id]);
-            $crew_name = $stmt->fetchColumn() ?: "ID:$id";
-
-            $pdo->prepare("DELETE FROM crews WHERE id=?")->execute([$id]);
-
-            $user = $_SESSION['user_name'] ?? 'System';
-            ActivityLog::log($user, "Deleted crew: $crew_name", "Eliminó cuadrilla: $crew_name", $id, 'crews');
-
-            $_SESSION['flash_success'] = $lang === 'es' ? 'Cuadrilla eliminada.' : 'Crew deleted.';
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header("Location: $base");
+            exit;
         }
+        $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
+        $stmt->execute([$id]);
+        $crew = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+        $crew_name = $crew['name'] ?? "ID:$id";
+        // Delete crew members first
+        $pdo->prepare("DELETE FROM crew_members WHERE crew_id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM crews WHERE id=?")->execute([$id]);
+
+        $user = $_SESSION['user_name'] ?? 'System';
+        ActivityLog::log($user, "Deleted crew: $crew_name", "Eliminó cuadrilla: $crew_name", $id, 'crews');
+
+        $_SESSION['flash_success'] = $lang === 'es' ? 'Cuadrilla eliminada.' : 'Crew deleted.';
         header("Location: $base");
         exit;
 
@@ -107,6 +123,16 @@ switch ($action) {
 
         if (!$crew_id || !$member_name) {
             $_SESSION['flash_error'] = $lang === 'es' ? 'Cuadrilla y nombre son requeridos.' : 'Crew and name are required.';
+            header("Location: $base");
+            exit;
+        }
+
+        // Validate crew ownership
+        $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
+        $stmt->execute([$crew_id]);
+        $crew = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
         }
@@ -127,10 +153,22 @@ switch ($action) {
 
     case 'remove_member':
         $member_id = (int)($_POST['member_id'] ?? 0);
-        if ($member_id > 0) {
-            $pdo->prepare("DELETE FROM crew_members WHERE id=?")->execute([$member_id]);
-            $_SESSION['flash_success'] = $lang === 'es' ? 'Miembro eliminado.' : 'Member removed.';
+        if ($member_id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header("Location: $base");
+            exit;
         }
+        // Validate member belongs to owned crew
+        $stmt = $pdo->prepare("SELECT cm.* FROM crew_members cm JOIN crews c ON cm.crew_id = c.id WHERE cm.id=?");
+        $stmt->execute([$member_id]);
+        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$member || ($member['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+        $pdo->prepare("DELETE FROM crew_members WHERE id=?")->execute([$member_id]);
+        $_SESSION['flash_success'] = $lang === 'es' ? 'Miembro eliminado.' : 'Member removed.';
         header("Location: $base");
         exit;
 

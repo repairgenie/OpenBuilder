@@ -23,7 +23,7 @@ switch ($action) {
         $co_value = floatval($_POST['change_order_value'] ?? 0);
         $contract_value = floatval($_POST['contract_value'] ?? 0);
         $revised = $contract_value + $co_value;
-        $stmt = $pdo->prepare("INSERT INTO prime_contracts (contract_number, contractor_name, contract_value, start_date, end_date, status, change_order_value, revised_contract_value, retention_percent, billing_frequency, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
+        $stmt = $pdo->prepare("INSERT INTO prime_contracts (contract_number, contractor_name, contract_value, start_date, end_date, status, change_order_value, revised_contract_value, retention_percent, billing_frequency, notes, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
             $_POST['contract_number'],
             $_POST['contractor_name'],
@@ -35,7 +35,8 @@ switch ($action) {
             $revised,
             floatval($_POST['retention_percent'] ?? 0),
             $_POST['billing_frequency'] ?: 'Monthly',
-            $_POST['notes'] ?: ''
+            $_POST['notes'] ?: '',
+            $_SESSION['user_id']
         ]);
 
         // Create initial version record
@@ -58,6 +59,16 @@ switch ($action) {
         $co_value = floatval($_POST['change_order_value'] ?? 0);
         $contract_value = floatval($_POST['contract_value'] ?? 0);
         $revised = $contract_value + $co_value;
+
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
+        $stmt->execute([$_POST['id']]);
+        $contract = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
 
         // Get current version number
         $ver_stmt = $pdo->prepare("SELECT MAX(version_number) FROM prime_contract_versions WHERE contract_id = ?");
@@ -105,6 +116,16 @@ switch ($action) {
             exit;
         }
 
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
+        $stmt->execute([$contract_id]);
+        $contract = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
+
         $co_value = floatval($_POST['change_order_value'] ?? 0);
         $contract_value = floatval($_POST['contract_value'] ?? 0);
         $revised = $contract_value + $co_value;
@@ -143,8 +164,23 @@ switch ($action) {
         break;
 
     case 'delete_contract':
-        $pdo->prepare("DELETE FROM prime_contract_versions WHERE contract_id = ?")->execute([$_POST['id']]);
-        $pdo->prepare("DELETE FROM prime_contracts WHERE id=?")->execute([$_POST['id']]);
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header($redirect);
+            exit;
+        }
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
+        $stmt->execute([$id]);
+        $contract = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
+        $pdo->prepare("DELETE FROM prime_contract_versions WHERE contract_id = ?")->execute([$id]);
+        $pdo->prepare("DELETE FROM prime_contracts WHERE id=?")->execute([$id]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Contrato eliminado.' : 'Contract deleted.';
         break;
 

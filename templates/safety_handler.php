@@ -57,8 +57,8 @@ switch ($action) {
             $gps_stamp = GPSEngine::formatStamp($lat, $lon);
             $stmt = $pdo->prepare("
                 INSERT INTO safety_hazards 
-                (description, location, severity, reported_date, reported_by, assigned_crew_id, corrective_action, status, image_path, latitude, longitude, gps_stamp, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+                (description, location, severity, reported_date, reported_by, reported_by_user, assigned_crew_id, corrective_action, status, image_path, latitude, longitude, gps_stamp, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
             ");
             $stmt->execute([
                 trim($_POST['description']),
@@ -66,6 +66,7 @@ switch ($action) {
                 $_POST['severity'],
                 $_POST['reported_date'],
                 (int)$_POST['reported_by'],
+                $_SESSION['user_id'],
                 !empty($_POST['assigned_crew_id']) ? (int)$_POST['assigned_crew_id'] : null,
                 trim($_POST['corrective_action'] ?? ''),
                 $_POST['status'] ?? 'Open',
@@ -89,6 +90,16 @@ switch ($action) {
         $id = (int)($_POST['id'] ?? 0);
         if (!$id) {
             $_SESSION['flash_error'] = $lang === 'es' ? 'ID de peligro inválido.' : 'Invalid hazard ID.';
+            header($redirect);
+            exit;
+        }
+
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
+        $stmt->execute([$id]);
+        $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
         }
@@ -159,17 +170,25 @@ switch ($action) {
             exit;
         }
 
-        // Get image path before deleting
-        $stmt = $pdo->prepare("SELECT image_path FROM safety_hazards WHERE id=?");
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
         $stmt->execute([$id]);
         $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
+
+        // Get image path before deleting
+        $image_path = $hazard['image_path'] ?? null;
 
         // Delete the record
         $pdo->prepare("DELETE FROM safety_hazards WHERE id=?")->execute([$id]);
 
         // Delete image file if exists
-        if (!empty($hazard['image_path'])) {
-            $img_file = __DIR__ . '/../' . $hazard['image_path'];
+        if (!empty($image_path)) {
+            $img_file = __DIR__ . '/../' . $image_path;
             if (file_exists($img_file)) {
                 unlink($img_file);
             }
@@ -185,6 +204,16 @@ switch ($action) {
         $id = (int)($_POST['id'] ?? 0);
         if (!$id) {
             $_SESSION['flash_error'] = $lang === 'es' ? 'ID de peligro inválido.' : 'Invalid hazard ID.';
+            header($redirect);
+            exit;
+        }
+
+        // Ownership check
+        $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
+        $stmt->execute([$id]);
+        $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
         }

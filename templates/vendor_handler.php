@@ -45,8 +45,8 @@ switch ($action) {
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO vendors (company_name, contact_name, email, trade_en, trade_es, rating) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$company_name, $contact_name, $email, $trade_en, $trade_es, $rating]);
+            $stmt = $pdo->prepare("INSERT INTO vendors (company_name, contact_name, email, trade_en, trade_es, rating, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$company_name, $contact_name, $email, $trade_en, $trade_es, $rating, $_SESSION['user_id']]);
             $new_id = $pdo->lastInsertId();
 
             // Log activity
@@ -75,6 +75,15 @@ switch ($action) {
             exit;
         }
 
+        $stmt = $pdo->prepare("SELECT * FROM vendors WHERE id=?");
+        $stmt->execute([$id]);
+        $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$vendor || ($vendor['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+
         try {
             $stmt = $pdo->prepare("UPDATE vendors SET company_name=?, contact_name=?, email=?, trade_en=?, trade_es=?, rating=? WHERE id=?");
             $stmt->execute([$company_name, $contact_name, $email, $trade_en, $trade_es, $rating, $id]);
@@ -91,18 +100,26 @@ switch ($action) {
 
     case 'delete_vendor':
         $id = (int)($_POST['id'] ?? 0);
-        if ($id > 0) {
-            $stmt = $pdo->prepare("SELECT company_name FROM vendors WHERE id=?");
-            $stmt->execute([$id]);
-            $vendor_name = $stmt->fetchColumn() ?: "ID:$id";
-
-            $pdo->prepare("DELETE FROM vendors WHERE id=?")->execute([$id]);
-
-            $user = $_SESSION['user_name'] ?? 'System';
-            ActivityLog::log($user, "Deleted vendor: $vendor_name", "Eliminó proveedor: $vendor_name", $id, 'vendors');
-
-            $_SESSION['flash_success'] = $lang === 'es' ? 'Proveedor eliminado.' : 'Vendor deleted.';
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header("Location: $base");
+            exit;
         }
+        $stmt = $pdo->prepare("SELECT * FROM vendors WHERE id=?");
+        $stmt->execute([$id]);
+        $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$vendor || ($vendor['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $base");
+            exit;
+        }
+        $vendor_name = $vendor['company_name'] ?? "ID:$id";
+        $pdo->prepare("DELETE FROM vendors WHERE id=?")->execute([$id]);
+
+        $user = $_SESSION['user_name'] ?? 'System';
+        ActivityLog::log($user, "Deleted vendor: $vendor_name", "Eliminó proveedor: $vendor_name", $id, 'vendors');
+
+        $_SESSION['flash_success'] = $lang === 'es' ? 'Proveedor eliminado.' : 'Vendor deleted.';
         header("Location: $base");
         exit;
 

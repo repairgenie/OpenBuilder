@@ -20,17 +20,32 @@ $redirect = "Location: ../index.php?page=change_orders&lang=$lang";
 
 switch ($action) {
     case 'create_change_order':
-        $stmt = $pdo->prepare("INSERT INTO change_orders (type, amount, event_id, cost_code_id, status) VALUES (?, ?, ?, ?, 'Draft')");
+        $stmt = $pdo->prepare("INSERT INTO change_orders (type, amount, event_id, cost_code_id, status, created_by) VALUES (?, ?, ?, ?, 'Draft', ?)");
         $stmt->execute([
             $_POST['type'],
             $_POST['amount'],
             $_POST['event_id'] ?: null,
-            $_POST['cost_code_id'] ?: null
+            $_POST['cost_code_id'] ?: null,
+            $_SESSION['user_id']
         ]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Orden de cambio creada.' : 'Change order created.';
         break;
 
     case 'update_change_order':
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header($redirect);
+            exit;
+        }
+        $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
+        $stmt->execute([$id]);
+        $co = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
         $stmt = $pdo->prepare("UPDATE change_orders SET type=?, amount=?, event_id=?, cost_code_id=?, status=? WHERE id=?");
         $stmt->execute([
             $_POST['type'],
@@ -38,19 +53,47 @@ switch ($action) {
             $_POST['event_id'] ?: null,
             $_POST['cost_code_id'] ?: null,
             $_POST['status'],
-            $_POST['id']
+            $id
         ]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Orden de cambio actualizada.' : 'Change order updated.';
         break;
 
     case 'delete_change_order':
-        $pdo->prepare("DELETE FROM change_orders WHERE id=?")->execute([$_POST['id']]);
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header($redirect);
+            exit;
+        }
+        $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
+        $stmt->execute([$id]);
+        $co = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
+        $pdo->prepare("DELETE FROM change_orders WHERE id=?")->execute([$id]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Orden de cambio eliminada.' : 'Change order deleted.';
         break;
 
     case 'commit_to_budget':
-        // Mark as Issued and flag as committed
-        $pdo->prepare("UPDATE change_orders SET status='Issued', budget_committed=1 WHERE id=?")->execute([$_POST['id']]);
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $_SESSION['flash_error'] = 'Invalid ID.';
+            header($redirect);
+            exit;
+        }
+        // Only Admin or owner can commit
+        $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
+        $stmt->execute([$id]);
+        $co = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header($redirect);
+            exit;
+        }
+        $pdo->prepare("UPDATE change_orders SET status='Issued', budget_committed=1 WHERE id=?")->execute([$id]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'CO comprometidos al presupuesto.' : 'Change order committed to budget.';
         break;
 
