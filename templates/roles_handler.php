@@ -26,8 +26,7 @@ $pdo = Database::connect();
 
 // Only allow CRUD on non-system roles (is_system = 0)
 // System roles can only be viewed/edited by Admin
-$current_user_role = $_SESSION['user_role'] ?? 'Viewer';
-if ($current_user_role !== 'Admin') {
+if (!has_role(['Admin'])) {
     $_SESSION['flash_error'] = $lang === 'es' ? 'Sin permisos para modificar roles.' : 'Permission denied.';
     header("Location: $base");
     exit;
