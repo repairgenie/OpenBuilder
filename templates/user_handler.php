@@ -5,7 +5,6 @@ require_once __DIR__ . '/../src/security_helper.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_auth();
-require_auth();
 
 $lang = $_GET['lang'] ?? 'en';
 $base = "../index.php?page=users&lang=$lang";
@@ -27,6 +26,11 @@ $pdo = Database::connect();
 
 switch ($action) {
     case 'create_user':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $name  = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $role  = trim($_POST['role'] ?? 'Viewer');
@@ -66,6 +70,11 @@ switch ($action) {
         exit;
 
     case 'update_user':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id    = (int)($_POST['id'] ?? 0);
         $name  = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -98,6 +107,11 @@ switch ($action) {
         exit;
 
     case 'delete_user':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id > 0) {
             // Get name before delete for log
@@ -117,6 +131,11 @@ switch ($action) {
         exit;
 
     case 'reset_password':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id > 0) {
             $stmt = $pdo->prepare("SELECT name FROM users WHERE id=?");

@@ -30,6 +30,11 @@ function generate_api_key() {
 
 switch ($action) {
     case 'create_api_key':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $name = trim($_POST['name'] ?? '');
         $user_id = $_SESSION['user_id'];
 
@@ -52,6 +57,11 @@ switch ($action) {
         exit;
 
     case 'delete_api_key':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id > 0) {
             $pdo->prepare("DELETE FROM api_keys WHERE id=?")->execute([$id]);

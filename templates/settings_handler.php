@@ -25,6 +25,11 @@ $section = $_POST['section'] ?? 'general';
 
 // ----- General -----
 if ($section === 'general') {
+    if (!has_role(['Manager', 'Admin'])) {
+        $_SESSION['flash_error'] = 'Access denied.';
+        header("Location: $base");
+        exit;
+    }
     set_setting('project_name', trim($_POST['project_name'] ?? ''));
     set_setting('project_location', trim($_POST['project_location'] ?? ''));
     set_setting('project_start_date', trim($_POST['project_start_date'] ?? ''));
@@ -36,6 +41,11 @@ if ($section === 'general') {
 
 // ----- Notifications -----
 if ($section === 'notifications') {
+    if (!has_role(['Manager', 'Admin'])) {
+        $_SESSION['flash_error'] = 'Access denied.';
+        header("Location: $base");
+        exit;
+    }
     set_setting('budget_alerts', $_POST['budget_alerts'] ?? '0');
     set_setting('new_rfi_notifications', $_POST['new_rfi_notifications'] ?? '0');
     set_setting('daily_log_reminders', $_POST['daily_log_reminders'] ?? '0');
@@ -45,6 +55,11 @@ if ($section === 'notifications') {
 
 // ----- Regional -----
 if ($section === 'regional') {
+    if (!has_role(['Manager', 'Admin'])) {
+        $_SESSION['flash_error'] = 'Access denied.';
+        header("Location: $base");
+        exit;
+    }
     set_setting('currency', trim($_POST['currency'] ?? 'USD'));
     set_setting('date_format', trim($_POST['date_format'] ?? 'Y-m-d'));
     set_setting('timezone', trim($_POST['timezone'] ?? 'America/Los_Angeles'));
@@ -54,6 +69,11 @@ if ($section === 'regional') {
 
 // ----- Danger Zone -----
 if ($section === 'danger') {
+    if (!has_role(['Admin'])) {
+        $_SESSION['flash_error'] = 'Access denied. Admin required.';
+        header("Location: $base");
+        exit;
+    }
     $confirm = trim($_POST['confirm_archive'] ?? '');
     if (strtolower($confirm) === strtolower($_POST['project_name'] ?? '')) {
         set_setting('project_archived', '1');

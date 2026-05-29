@@ -12,7 +12,7 @@
     },
     {
       "name": "PHPSESSID",
-      "value": "2n59qsoa4cktuc2lcl9bqk500r",
+      "value": "eagbhh346ala9vhj6o2aonb11m",
       "domain": "localhost",
       "path": "/",
       "expires": -1,
@@ -21,5 +21,5 @@
       "sameSite": "Lax"
     }
   ],
-  "timestamp": 1780083381188
+  "timestamp": 1780083853647
 }

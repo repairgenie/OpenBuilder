@@ -22,6 +22,10 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 switch ($action) {
     case 'upload': {
+        if (!has_role(['Manager', 'Admin'])) {
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
         $title = trim($_POST['title'] ?? '');
         $doc_type = trim($_POST['doc_type'] ?? '');
         $discipline = trim($_POST['discipline'] ?? '');
@@ -55,6 +59,10 @@ switch ($action) {
     }
 
     case 'new_revision': {
+        if (!has_role(['Manager', 'Admin'])) {
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
         $doc_id = intval($_POST['doc_id'] ?? 0);
         $notes = trim($_POST['notes'] ?? '');
 
@@ -78,6 +86,10 @@ switch ($action) {
     }
 
     case 'check_out': {
+        if (!has_role(['Manager', 'Admin'])) {
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
         $doc_id = intval($_POST['doc_id'] ?? 0);
         $stmt = $pdo->prepare("UPDATE closeout_documents SET checked_out_by = ?, checked_out_at = datetime('now') WHERE id = ?");
         $stmt->execute([$_SESSION['user_id'] ?? 'guest', $doc_id]);
@@ -86,6 +98,10 @@ switch ($action) {
     }
 
     case 'check_in': {
+        if (!has_role(['Manager', 'Admin'])) {
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
         $doc_id = intval($_POST['doc_id'] ?? 0);
         $stmt = $pdo->prepare("UPDATE closeout_documents SET checked_out_by = NULL, checked_out_at = NULL WHERE id = ?");
         $stmt->execute([$doc_id]);
@@ -94,6 +110,10 @@ switch ($action) {
     }
 
     case 'delete': {
+        if (!has_role(['Admin'])) {
+            echo json_encode(['success' => false, 'error' => 'Access denied. Admin required.']);
+            exit;
+        }
         $doc_id = intval($_POST['doc_id'] ?? 0);
         $perm->requirePermission('delete_docs');
         // Remove versions and links
