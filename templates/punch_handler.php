@@ -27,7 +27,7 @@ switch ($action) {
             $_POST['assigned_to'] ?: null,
             $_POST['priority'] ?: 'Medium',
             $_POST['due_date'] ?: null,
-            $_POST['created_by'],
+            $_SESSION['user_id'],
             $_POST['latitude'] ?: null,
             $_POST['longitude'] ?: null
         ]);
@@ -35,6 +35,14 @@ switch ($action) {
         break;
 
     case 'update_punch':
+        $stmt = $pdo->prepare("SELECT * FROM punch_list_items WHERE id=?");
+        $stmt->execute([$_POST['id']]);
+        $punch = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$punch || ($punch['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $redirect");
+            exit;
+        }
         $stmt = $pdo->prepare("UPDATE punch_list_items SET description=?, location=?, assigned_to=?, priority=?, due_date=?, latitude=?, longitude=? WHERE id=?");
         $stmt->execute([
             $_POST['description'],
@@ -50,6 +58,14 @@ switch ($action) {
         break;
 
     case 'verify_punch':
+        $stmt = $pdo->prepare("SELECT * FROM punch_list_items WHERE id=?");
+        $stmt->execute([$_POST['id']]);
+        $punch = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$punch || ($punch['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $redirect");
+            exit;
+        }
         $pdo->prepare("UPDATE punch_list_items SET status='Verified' WHERE id=?")->execute([$_POST['id']]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Punch item verificado.' : 'Punch item verified.';
         break;

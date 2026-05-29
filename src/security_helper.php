@@ -29,9 +29,12 @@ function csrf_validate() {
 
 function require_auth() {
     if (session_status() === PHP_SESSION_NONE) session_start();
-    // Test mode bypass for E2E tests
+    // Test mode bypass for E2E tests (development only)
     if (!empty($_COOKIE['ob_test_mode']) && $_COOKIE['ob_test_mode'] === '1') {
-        if (empty($_SESSION['user_id'])) {
+        $env = getenv('APP_ENV') ?: 'development';
+        if ($env === 'production') {
+            // In production, ob_test_mode is not allowed
+        } elseif (empty($_SESSION['user_id'])) {
             $_SESSION['user_id'] = 1;
             $_SESSION['user_name'] = 'Test User';
             $_SESSION['role'] = 'Admin';

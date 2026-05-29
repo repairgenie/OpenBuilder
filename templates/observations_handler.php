@@ -22,8 +22,8 @@ switch ($action) {
     case 'create_observation':
         $stmt = $pdo->prepare("INSERT INTO observations (project_id, observer_id, observation_text, category, assigned_to, priority, status, latitude, longitude, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
-            $_POST['project_id'],
-            $_POST['observer_id'],
+            $_POST['project_id'] ?: 1,
+            $_SESSION['user_id'],
             $_POST['observation_text'],
             $_POST['category'],
             $_POST['assigned_to'] ?: null,
@@ -36,9 +36,17 @@ switch ($action) {
         break;
 
     case 'update_observation':
+        $stmt = $pdo->prepare("SELECT * FROM observations WHERE id=?");
+        $stmt->execute([$_POST['id']]);
+        $obs = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$obs || ($obs['observer_id'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $redirect");
+            exit;
+        }
         $stmt = $pdo->prepare("UPDATE observations SET project_id=?, observation_text=?, category=?, assigned_to=?, priority=?, status=?, latitude=?, longitude=? WHERE id=?");
         $stmt->execute([
-            $_POST['project_id'],
+            $_POST['project_id'] ?: $obs['project_id'],
             $_POST['observation_text'],
             $_POST['category'],
             $_POST['assigned_to'] ?: null,
@@ -52,6 +60,14 @@ switch ($action) {
         break;
 
     case 'delete_observation':
+        $stmt = $pdo->prepare("SELECT * FROM observations WHERE id=?");
+        $stmt->execute([$_POST['id']]);
+        $obs = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$obs || ($obs['observer_id'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $redirect");
+            exit;
+        }
         $pdo->prepare("DELETE FROM observations WHERE id=?")->execute([$_POST['id']]);
         $_SESSION['flash_success'] = $lang === 'es' ? 'Observación eliminada.' : 'Observation deleted.';
         break;
