@@ -98,7 +98,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
         $stmt->execute([$id]);
         $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$hazard || (!can_modify($hazard['reported_by_user'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -174,7 +174,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
         $stmt->execute([$id]);
         $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$hazard || (!can_modify($hazard['reported_by_user'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -212,7 +212,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM safety_hazards WHERE id=?");
         $stmt->execute([$id]);
         $hazard = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$hazard || ($hazard['reported_by_user'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$hazard || (!can_modify($hazard['reported_by_user'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;

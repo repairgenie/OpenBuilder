@@ -44,7 +44,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM observations WHERE id=?");
         $stmt->execute([$_POST['id']]);
         $obs = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$obs || ($obs['observer_id'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$obs || (!can_modify($obs['observer_id'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $redirect");
             exit;
@@ -68,7 +68,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM observations WHERE id=?");
         $stmt->execute([$_POST['id']]);
         $obs = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$obs || ($obs['observer_id'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$obs || (!can_modify($obs['observer_id'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $redirect");
             exit;

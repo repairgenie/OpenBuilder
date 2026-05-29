@@ -61,7 +61,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM media WHERE id=?");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row || ($row['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$row || (!can_modify($row['created_by'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;

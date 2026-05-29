@@ -63,7 +63,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM timesheets WHERE id=?");
         $stmt->execute([$id]);
         $ts = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$ts || ($ts['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$ts || (!can_modify($ts['created_by'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -108,7 +108,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM timesheets WHERE id=?");
         $stmt->execute([$id]);
         $timesheet = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$timesheet || ($timesheet['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$timesheet || (!can_modify($timesheet['created_by'], ['Manager']))) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;

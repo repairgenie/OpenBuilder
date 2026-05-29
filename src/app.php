@@ -104,6 +104,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
     switch ($_POST['action']) {
         case 'create_rfi':
+            if (!has_role(['Worker', 'Manager', 'Admin'])) {
+                header("HTTP/1.1 403 Forbidden");
+                exit;
+            }
             $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date, created_by) VALUES (:ref_number, :subject, :status, :priority, :due_date, :created_by)");
             $stmt->execute([
                 ':ref_number' => $_POST['ref_number'] ?? '',
@@ -117,6 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
 
         case 'create_daily_log':
+            if (!has_role(['Worker', 'Manager', 'Admin'])) {
+                header("HTTP/1.1 403 Forbidden");
+                exit;
+            }
             if (!isset($_SESSION['user_id'])) {
                 header("HTTP/1.1 403 Forbidden");
                 exit;
@@ -142,6 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
 
         case 'create_cost_code':
+            if (!has_role(['Manager', 'Admin'])) {
+                header("HTTP/1.1 403 Forbidden");
+                exit;
+            }
             $stmt = $pdo->prepare("INSERT INTO cost_codes (code, name, original_budget, created_by) VALUES (:code, :name, :original_budget, :created_by)");
             $stmt->execute([
                 ':code' => $_POST['code'] ?? '',
@@ -159,10 +171,18 @@ if (isset($_GET['action'])) {
     require_auth();
     require_once __DIR__ . '/Exporter.php';
     if ($_GET['action'] === 'export_rfis') {
+        if (!has_role(['Manager', 'Admin'])) {
+            header("HTTP/1.1 403 Forbidden");
+            exit;
+        }
         $stmt = $pdo->query("SELECT * FROM rfis ORDER BY id DESC");
         Exporter::exportRFIs($stmt->fetchAll(PDO::FETCH_ASSOC), $lang);
     }
     if ($_GET['action'] === 'export_budget') {
+        if (!has_role(['Manager', 'Admin'])) {
+            header("HTTP/1.1 403 Forbidden");
+            exit;
+        }
         $stmt = $pdo->query("SELECT * FROM cost_codes ORDER BY code ASC");
         Exporter::exportBudget($stmt->fetchAll(PDO::FETCH_ASSOC), $lang);
     }
