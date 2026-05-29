@@ -20,6 +20,11 @@ $redirect = "Location: ../index.php?page=equipment&lang=$lang";
 
 switch ($action) {
     case 'create_equipment':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $stmt = $pdo->prepare("INSERT INTO equipment (asset_tag, name, type, status, assigned_project, assigned_crew_id, last_service_date, next_service_date, notes, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
             $_POST['asset_tag'],
@@ -46,7 +51,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM equipment WHERE id=?");
         $stmt->execute([$id]);
         $eq = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$eq || ($eq['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$eq || !can_modify($eq['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -68,6 +73,11 @@ switch ($action) {
         break;
 
     case 'retire_equipment':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -77,7 +87,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM equipment WHERE id=?");
         $stmt->execute([$id]);
         $eq = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$eq || ($eq['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$eq || !can_modify($eq['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -96,7 +106,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM equipment WHERE id=?");
         $stmt->execute([$equipment_id]);
         $eq = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$eq || ($eq['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$eq || !can_modify($eq['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;

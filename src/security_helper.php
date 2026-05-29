@@ -67,6 +67,27 @@ function require_role($role) {
     }
 }
 
+/**
+ * Check if user has any of the allowed roles, or is Admin.
+ * @param string|array $roles Single role or array of roles
+ */
+function has_role($roles) {
+    if (($_SESSION['role'] ?? '') === 'Admin') return true;
+    if (is_string($roles)) $roles = [$roles];
+    return in_array($_SESSION['role'] ?? '', $roles, true);
+}
+
+/**
+ * Check if user can modify a resource: is owner or has role/Admin.
+ * @param int $owner_id Database row owner user ID
+ * @param string|array $required_roles Roles that can bypass ownership check
+ */
+function can_modify($owner_id, $required_roles = 'Manager') {
+    if (($_SESSION['role'] ?? '') === 'Admin') return true;
+    if (has_role($required_roles)) return true;
+    return $_SESSION['user_id'] == $owner_id;
+}
+
 // Quick Win 1 helpers
 function get_setting($key, $default = '') {
     static $cache = [];

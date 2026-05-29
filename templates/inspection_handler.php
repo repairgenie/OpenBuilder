@@ -21,6 +21,11 @@ $redirect = "Location: ../index.php?page=inspection_schedule&lang=$lang";
 
 switch ($action) {
     case 'schedule_inspection':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $stmt = $pdo->prepare("INSERT INTO inspections (title, template_id, inspector_id, location, project_id, scheduled_date, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
             $_POST['title'],
@@ -61,7 +66,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM inspections WHERE id=?");
         $stmt->execute([$id]);
         $insp = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$insp || ($insp['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$insp || !can_modify($insp['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -80,6 +85,11 @@ switch ($action) {
         break;
 
     case 'delete_inspection':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -89,7 +99,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM inspections WHERE id=?");
         $stmt->execute([$id]);
         $insp = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$insp || ($insp['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$insp || !can_modify($insp['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -100,6 +110,11 @@ switch ($action) {
         break;
 
     case 'save_results':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $inspection_id = intval($_POST['inspection_id'] ?? 0);
         if ($inspection_id <= 0) {
             $_SESSION['flash_error'] = 'Invalid inspection ID.';
@@ -110,7 +125,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM inspections WHERE id=?");
         $stmt->execute([$inspection_id]);
         $insp = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$insp || ($insp['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$insp || !can_modify($insp['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -136,6 +151,11 @@ switch ($action) {
         exit;
 
     case 'create_template':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $title = trim($_POST['template_title'] ?? '');
         $sections_json = $_POST['sections_json'] ?? '[]';
         if (empty($title)) {

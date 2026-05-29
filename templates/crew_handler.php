@@ -26,6 +26,11 @@ $pdo = Database::connect();
 
 switch ($action) {
     case 'create_crew':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $name = trim($_POST['name'] ?? '');
         $trade_en = trim($_POST['trade_en'] ?? '');
         $trade_es = trim($_POST['trade_es'] ?? '');
@@ -68,7 +73,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
         $stmt->execute([$id]);
         $crew = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$crew || !can_modify($crew['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -98,7 +103,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
         $stmt->execute([$id]);
         $crew = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$crew || !can_modify($crew['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -116,6 +121,11 @@ switch ($action) {
         exit;
 
     case 'add_member':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $crew_id = (int)($_POST['crew_id'] ?? 0);
         $member_name = trim($_POST['member_name'] ?? '');
         $role = trim($_POST['role'] ?? '');
@@ -131,7 +141,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM crews WHERE id=?");
         $stmt->execute([$crew_id]);
         $crew = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$crew || ($crew['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$crew || !can_modify($crew['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -152,6 +162,11 @@ switch ($action) {
         exit;
 
     case 'remove_member':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $member_id = (int)($_POST['member_id'] ?? 0);
         if ($member_id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -159,10 +174,10 @@ switch ($action) {
             exit;
         }
         // Validate member belongs to owned crew
-        $stmt = $pdo->prepare("SELECT cm.* FROM crew_members cm JOIN crews c ON cm.crew_id = c.id WHERE cm.id=?");
+        $stmt = $pdo->prepare("SELECT cm.*, c.created_by as crew_owner FROM crew_members cm JOIN crews c ON cm.crew_id = c.id WHERE cm.id=?");
         $stmt->execute([$member_id]);
         $member = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$member || ($member['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$member || !can_modify($member['crew_owner'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;

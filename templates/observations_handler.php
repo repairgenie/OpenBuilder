@@ -20,6 +20,11 @@ $redirect = "Location: ../index.php?page=observations&lang=$lang";
 
 switch ($action) {
     case 'create_observation':
+        if (!has_role(['Worker', 'Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied.';
+            header("Location: $redirect");
+            exit;
+        }
         $stmt = $pdo->prepare("INSERT INTO observations (project_id, observer_id, observation_text, category, assigned_to, priority, status, latitude, longitude, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $stmt->execute([
             $_POST['project_id'] ?: 1,

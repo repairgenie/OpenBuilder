@@ -26,6 +26,11 @@ $pdo = Database::connect();
 
 switch ($action) {
     case 'create_vendor':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $company_name = trim($_POST['company_name'] ?? '');
         $contact_name = trim($_POST['contact_name'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -78,7 +83,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM vendors WHERE id=?");
         $stmt->execute([$id]);
         $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$vendor || ($vendor['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$vendor || !can_modify($vendor['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -99,6 +104,11 @@ switch ($action) {
         exit;
 
     case 'delete_vendor':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -108,7 +118,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM vendors WHERE id=?");
         $stmt->execute([$id]);
         $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$vendor || ($vendor['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$vendor || !can_modify($vendor['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;

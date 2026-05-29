@@ -20,6 +20,11 @@ $redirect = "Location: ../index.php?page=change_orders&lang=$lang";
 
 switch ($action) {
     case 'create_change_order':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $stmt = $pdo->prepare("INSERT INTO change_orders (type, amount, event_id, cost_code_id, status, created_by) VALUES (?, ?, ?, ?, 'Draft', ?)");
         $stmt->execute([
             $_POST['type'],
@@ -41,7 +46,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
         $stmt->execute([$id]);
         $co = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$co || !can_modify($co['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -59,6 +64,11 @@ switch ($action) {
         break;
 
     case 'delete_change_order':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -68,7 +78,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
         $stmt->execute([$id]);
         $co = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$co || !can_modify($co['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -78,6 +88,11 @@ switch ($action) {
         break;
 
     case 'commit_to_budget':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header($redirect);
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -88,7 +103,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM change_orders WHERE id=?");
         $stmt->execute([$id]);
         $co = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$co || ($co['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$co || !can_modify($co['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;

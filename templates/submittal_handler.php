@@ -26,6 +26,11 @@ $pdo = Database::connect();
 
 switch ($action) {
     case 'create_submittal':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $title_en = trim($_POST['title_en'] ?? '');
         $title_es = trim($_POST['title_es'] ?? '');
         $spec_section = trim($_POST['spec_section'] ?? '');
@@ -72,7 +77,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM submittals WHERE id=?");
         $stmt->execute([$id]);
         $sub = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$sub || ($sub['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$sub || !can_modify($sub['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;
@@ -93,6 +98,11 @@ switch ($action) {
         exit;
 
     case 'delete_submittal':
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin required.';
+            header("Location: $base");
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -102,7 +112,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM submittals WHERE id=?");
         $stmt->execute([$id]);
         $sub = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$sub || ($sub['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$sub || !can_modify($sub['created_by'], ['Manager'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header("Location: $base");
             exit;

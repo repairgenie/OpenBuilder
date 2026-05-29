@@ -20,6 +20,11 @@ $redirect = "Location: ../index.php?page=prime_contracts&lang=$lang";
 
 switch ($action) {
     case 'create_contract':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required for prime contracts.';
+            header($redirect);
+            exit;
+        }
         $co_value = floatval($_POST['change_order_value'] ?? 0);
         $contract_value = floatval($_POST['contract_value'] ?? 0);
         $revised = $contract_value + $co_value;
@@ -56,6 +61,11 @@ switch ($action) {
         break;
 
     case 'update_contract':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header($redirect);
+            exit;
+        }
         $co_value = floatval($_POST['change_order_value'] ?? 0);
         $contract_value = floatval($_POST['contract_value'] ?? 0);
         $revised = $contract_value + $co_value;
@@ -64,7 +74,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
         $stmt->execute([$_POST['id']]);
         $contract = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$contract || !can_modify($contract['created_by'], ['Admin'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -109,6 +119,11 @@ switch ($action) {
         break;
 
     case 'new_version':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header($redirect);
+            exit;
+        }
         $contract_id = intval($_POST['id'] ?? 0);
         if ($contract_id === 0) {
             $_SESSION['flash_error'] = $lang === 'es' ? 'ID de contrato inválido.' : 'Invalid contract ID.';
@@ -120,7 +135,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
         $stmt->execute([$contract_id]);
         $contract = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$contract || !can_modify($contract['created_by'], ['Admin'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;
@@ -164,6 +179,11 @@ switch ($action) {
         break;
 
     case 'delete_contract':
+        if (!has_role(['Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Admin required.';
+            header($redirect);
+            exit;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'Invalid ID.';
@@ -174,7 +194,7 @@ switch ($action) {
         $stmt = $pdo->prepare("SELECT * FROM prime_contracts WHERE id=?");
         $stmt->execute([$id]);
         $contract = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$contract || ($contract['created_by'] != $_SESSION['user_id'] && $_SESSION['role'] !== 'Admin')) {
+        if (!$contract || !can_modify($contract['created_by'], ['Admin'])) {
             $_SESSION['flash_error'] = 'Access denied.';
             header($redirect);
             exit;

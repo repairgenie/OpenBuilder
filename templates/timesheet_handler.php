@@ -126,6 +126,12 @@ switch ($action) {
             header("Location: $base");
             exit;
         }
+        // Role check: only Manager or Admin can approve timesheets
+        if (!has_role(['Manager', 'Admin'])) {
+            $_SESSION['flash_error'] = 'Access denied. Manager or Admin role required.';
+            header("Location: $base");
+            exit;
+        }
         $stmt = $pdo->prepare("SELECT * FROM timesheets WHERE id=?");
         $stmt->execute([$id]);
         $ts = $stmt->fetch(PDO::FETCH_ASSOC);
