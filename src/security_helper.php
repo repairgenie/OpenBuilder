@@ -33,14 +33,18 @@ function require_auth() {
     if (!empty($_COOKIE['ob_test_mode']) && $_COOKIE['ob_test_mode'] === '1') {
         $env = getenv('APP_ENV') ?: 'development';
         if ($env === 'production') {
-            // In production, ob_test_mode is not allowed
-        } elseif (empty($_SESSION['user_id'])) {
-            $_SESSION['user_id'] = 1;
-            $_SESSION['user_name'] = 'Test User';
-            $_SESSION['role'] = 'Admin';
-            $_SESSION['email'] = 'test@openbuilder.local';
+            // In production, ob_test_mode is not allowed — don't bypass auth
+            error_log("SECURITY: ob_test_mode cookie rejected in production");
+        } else {
+            // Test mode bypass for E2E tests (development only)
+            if (empty($_SESSION['user_id'])) {
+                $_SESSION['user_id'] = 1;
+                $_SESSION['user_name'] = 'Test User';
+                $_SESSION['role'] = 'Admin';
+                $_SESSION['email'] = 'test@openbuilder.local';
+            }
+            return;
         }
-        return;
     }
     if (empty($_SESSION['user_id'])) {
         error_log("require_auth: redirecting — no user_id in session. PHPSESSID=" . session_id() . ". session_keys=" . json_encode(array_keys($_SESSION)));

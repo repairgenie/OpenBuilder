@@ -49,8 +49,11 @@ if (!$handled) {
 function getProjects($pdo, $req) {
     $limit = intval($req['limit'] ?? 50);
     $offset = intval($req['offset'] ?? 0);
-    $projects = $pdo->query("SELECT * FROM projects ORDER BY id DESC LIMIT $limit OFFSET $offset")->fetchAll(PDO::FETCH_ASSOC);
-    return ['data' => $projects];
+    $projects = $pdo->prepare("SELECT * FROM projects ORDER BY id DESC LIMIT :limit OFFSET :offset");
+    $projects->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $projects->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $projects->execute();
+    return ['data' => $projects->fetchAll(PDO::FETCH_ASSOC)];
 }
 
 function getRFIs($pdo, $req) {
@@ -63,8 +66,10 @@ function getRFIs($pdo, $req) {
 
 function getDailyLogs($pdo, $req) {
     $limit = intval($req['limit'] ?? 50);
-    $logs = $pdo->query("SELECT * FROM daily_logs ORDER BY log_date DESC, id DESC LIMIT $limit")->fetchAll(PDO::FETCH_ASSOC);
-    return ['data' => $logs];
+    $stmt = $pdo->prepare("SELECT * FROM daily_logs ORDER BY log_date DESC, id DESC LIMIT :limit");
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return ['data' => $stmt->fetchAll(PDO::FETCH_ASSOC)];
 }
 
 function getBudget($pdo, $req) {

@@ -1,7 +1,1 @@
-[Wed May  6 21:30:14 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Wed May  6 21:30:28 2026] [::1]:55630 Accepted
-[Wed May  6 21:30:28 2026] [::1]:55630 Closing
-[Wed May  6 21:30:32 2026] [::1]:55634 Accepted
-[Wed May  6 21:30:32 2026] [::1]:55634 Closing
-[Wed May  6 21:30:32 2026] [::1]:55646 Accepted
-[Wed May  6 21:30:32 2026] [::1]:55646 Closing
+[Fri May 29 16:37:47 2026] Failed to listen on localhost:9000 (reason: Address already in use)
