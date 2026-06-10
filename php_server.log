@@ -1,1 +1,39 @@
-[Fri May 29 16:37:47 2026] Failed to listen on localhost:9000 (reason: Address already in use)
+[Wed Jun 10 13:20:00 2026] PHP 8.3.6 Development Server (http://localhost:8080) started
+[Wed Jun 10 13:20:15 2026] 127.0.0.1:39554 Accepted
+[Wed Jun 10 13:20:15 2026] 127.0.0.1:39554 [200]: GET /?page=login
+[Wed Jun 10 13:20:15 2026] 127.0.0.1:39554 Closing
+[Wed Jun 10 13:20:20 2026] 127.0.0.1:49124 Accepted
+[Wed Jun 10 13:20:20 2026] 127.0.0.1:49124 [200]: GET /?page=login
+[Wed Jun 10 13:20:20 2026] 127.0.0.1:49124 Closing
+[Wed Jun 10 13:20:24 2026] 127.0.0.1:49126 Accepted
+[Wed Jun 10 13:20:24 2026] 127.0.0.1:49126 [200]: GET /?page=dashboard
+[Wed Jun 10 13:20:24 2026] 127.0.0.1:49126 Closing
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43024 Accepted
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43024 [200]: GET /?page=login&lang=es
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43024 Closing
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43030 Accepted
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43030 [200]: GET /?page=login
+[Wed Jun 10 13:20:30 2026] 127.0.0.1:43030 Closing
+[Wed Jun 10 13:20:34 2026] 127.0.0.1:43036 Accepted
+[Wed Jun 10 13:20:34 2026] require_auth: redirecting — no user_id in session. PHPSESSID=iluugo6349ghgq7duq15ghd2bt. session_keys=[]
+[Wed Jun 10 13:20:34 2026] 127.0.0.1:43036 [302]: GET /?page=rfis
+[Wed Jun 10 13:20:34 2026] 127.0.0.1:43036 Closing
+[Wed Jun 10 13:20:38 2026] 127.0.0.1:36894 Accepted
+[Wed Jun 10 13:20:38 2026] require_auth: redirecting — no user_id in session. PHPSESSID=53qtv54pak6f86ihavapm59073. session_keys=[]
+[Wed Jun 10 13:20:38 2026] 127.0.0.1:36894 [302]: GET /?page=rfis
+[Wed Jun 10 13:20:38 2026] 127.0.0.1:36894 Closing
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36908 Accepted
+[Wed Jun 10 13:20:41 2026] require_auth: redirecting — no user_id in session. PHPSESSID=oq9akgjdntltri2ppm77v2f7bk. session_keys=[]
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36908 [302]: GET /?page=rfis&lang=en
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36908 Closing
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36920 Accepted
+[Wed Jun 10 13:20:41 2026] require_auth: redirecting — no user_id in session. PHPSESSID=d5j0sgks87ji5jpf15n21q6e95. session_keys=[]
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36920 [302]: GET /?page=rfis&lang=en
+[Wed Jun 10 13:20:41 2026] 127.0.0.1:36920 Closing
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36934 Accepted
+[Wed Jun 10 13:20:44 2026] require_auth: redirecting — no user_id in session. PHPSESSID=b91sjovi2fm7rocr6bkd8ug04m. session_keys=[]
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36934 [302]: GET /?page=rfis&lang=en
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36934 Closing
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36950 Accepted
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36950 [200]: GET /?page=dashboard&lang=en
+[Wed Jun 10 13:20:44 2026] 127.0.0.1:36950 Closing
