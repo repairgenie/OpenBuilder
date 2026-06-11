@@ -15,7 +15,7 @@ const { expect } = require('@playwright/test');
 class LoginPage {
   constructor(page) {
     this.page = page;
-    this.baseUrl = page.context()._options.baseURL || 'http://localhost:8080';
+    this.baseUrl = process.env.TEST_BASE_URL || 'http://localhost:8080';
   }
 
   /** Navigate to the login page */

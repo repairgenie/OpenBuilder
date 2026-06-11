@@ -50,7 +50,7 @@ $l = $labels[$lang] ?? $labels['en'];
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="login_handler.php?lang=<?php echo $lang; ?>" class="space-y-4">
+        <form method="POST" action="templates/login_handler.php?lang=<?php echo $lang; ?>" class="space-y-4">
             <?php echo csrf_field(); ?>
 
             <div>

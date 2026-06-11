@@ -54,11 +54,20 @@ $_SESSION['email'] = $email;
 $_SESSION['name'] = $valid_users[$email]['name'];
 $_SESSION['role'] = $valid_users[$email]['role'];
 $_SESSION['logged_in'] = true;
+$_SESSION['mfa_verified'] = true;
+
+// Test mode bypass: skip MFA verification (development only)
+if (!empty($_COOKIE['ob_test_mode']) && $_COOKIE['ob_test_mode'] === '1'
+    && (getenv('APP_ENV') ?: 'development') !== 'production') {
+    error_log("login_handler: ob_test_mode=1 → skipping MFA, redirecting to dashboard");
+    header("Location: ../index.php?page=dashboard&lang=$lang");
+    exit;
+}
 
 // Generate and store MFA code
 $mfa_code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 $_SESSION['mfa_code'] = $mfa_code;
 
-// Redirect to MFA verification (standalone mfa.php)
-header("Location: ../mfa.php?lang=$lang&sent=1");
+// Redirect to MFA verification (route through index.php so templates/mfa.php is included)
+header("Location: ../index.php?page=mfa&lang=$lang&sent=1");
 exit;

@@ -18,6 +18,19 @@ require_once __DIR__ . '/src/app.php';
 $page = $_GET['page'] ?? 'dashboard';
 $lang = $_GET['lang'] ?? 'en';
 
+// Pages that render their own complete HTML (no layout wrapping)
+$standalone_pages = ['mfa'];
+if (in_array($page, $standalone_pages, true)) {
+    $template_file = __DIR__ . "/templates/{$page}.php";
+    if (file_exists($template_file)) {
+        include $template_file;
+    } else {
+        http_response_code(404);
+        echo "Not Found";
+    }
+    exit;
+}
+
 // Include Header
 include_once __DIR__ . '/layouts/header.php';
 ?>

@@ -12,6 +12,7 @@
 const { test } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
+const { setTestModeCookie } = require('../helpers/auth');
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:8080';
 const AUTH_DIR = path.join(__dirname, '../.auth');
@@ -24,7 +25,7 @@ test('authenticate-admin', async ({ page }) => {
   await page.context().addCookies([{
     name: 'ob_test_mode',
     value: '1',
-    domain: 'localhost',
+    domain: (new URL(BASE_URL).hostname),
     path: '/',
   }]);
 
@@ -108,7 +109,7 @@ test('authenticate-manager', async ({ page }) => {
   await page.context().addCookies([{
     name: 'ob_test_mode',
     value: '1',
-    domain: 'localhost',
+    domain: (new URL(BASE_URL).hostname),
     path: '/',
   }]);
 
@@ -133,7 +134,7 @@ test('authenticate-sub', async ({ page }) => {
   await page.context().addCookies([{
     name: 'ob_test_mode',
     value: '1',
-    domain: 'localhost',
+    domain: (new URL(BASE_URL).hostname),
     path: '/',
   }]);
 

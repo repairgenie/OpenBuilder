@@ -89,7 +89,7 @@ test.describe('API Authorization', () => {
     await context.addCookies([{
       name: 'PHPSESSID',
       value: 'expired_or_invalid_session_value',
-      domain: 'localhost',
+      domain: (new URL(BASE_URL).hostname),
       path: '/'
     }]);
 

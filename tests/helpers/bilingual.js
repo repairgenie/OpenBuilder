@@ -75,8 +75,10 @@ const TRANSLATIONS = {
  * @param {'en'|'es'} lang - Language code
  */
 async function gotoLang(page, path, lang) {
+  const base = (process.env.TEST_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
+  const pathPart = path.startsWith('/') ? path : '/' + path;
   const separator = path.includes('?') ? '&' : '?';
-  await page.goto(`${path}${separator}lang=${lang}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${base}${pathPart}${separator}lang=${lang}`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
 }
 

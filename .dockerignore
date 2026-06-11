@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+node_modules
+test-results
+playwright-report
+audit
+audits
+docs
+.DS_Store
+*.log
+data/

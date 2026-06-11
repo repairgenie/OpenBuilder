@@ -83,7 +83,7 @@ test.describe('MFA Flow', () => {
     await page.context().addCookies([{
       name: 'ob_test_mode',
       value: '1',
-      domain: 'localhost',
+      domain: (new URL(BASE_URL).hostname),
       path: '/',
     }]);
     await page.goto(`${BASE_URL}/?page=login`, { waitUntil: 'domcontentloaded' });

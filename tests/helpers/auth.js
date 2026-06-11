@@ -12,6 +12,34 @@ const MANAGER_FILE = path.join(AUTH_DIR, 'manager-session.json');
 const SUB_FILE = path.join(AUTH_DIR, 'sub-session.json');
 
 /**
+ * Derive the cookie domain from BASE_URL so tests work against any host
+ * (localhost, 127.0.0.1, 192.168.8.147, etc.). Defaults to 'localhost'.
+ */
+function getCookieDomain() {
+  const base = process.env.TEST_BASE_URL || 'http://localhost:8080';
+  try {
+    const u = new URL(base);
+    return u.hostname || 'localhost';
+  } catch {
+    return 'localhost';
+  }
+}
+
+/**
+ * Inject the ob_test_mode=1 bypass cookie. Must be called BEFORE navigating
+ * to a protected page or PHP will redirect to login.
+ * @param {import('@playwright/test').Page} page
+ */
+async function setTestModeCookie(page) {
+  await page.context().addCookies([{
+    name: 'ob_test_mode',
+    value: '1',
+    domain: getCookieDomain(),
+    path: '/',
+  }]);
+}
+
+/**
  * Restore admin session cookies.
  * @param {import('@playwright/test').Page} page
  * @returns {Promise<boolean>} true if cookies were restored successfully
@@ -24,13 +52,8 @@ async function restoreAuth(page) {
   const { cookies } = JSON.parse(fs.readFileSync(COOKIE_FILE, 'utf8'));
   if (!cookies || cookies.length === 0) return false;
 
-  // Set test mode cookie
-  await page.context().addCookies([{
-    name: 'ob_test_mode',
-    value: '1',
-    domain: 'localhost',
-    path: '/',
-  }]);
+  // Set test mode cookie first
+  await setTestModeCookie(page);
   await page.context().addCookies(cookies);
   return true;
 }
@@ -42,12 +65,7 @@ async function restoreManagerAuth(page) {
   if (!fs.existsSync(MANAGER_FILE)) return false;
   const { cookies } = JSON.parse(fs.readFileSync(MANAGER_FILE, 'utf8'));
   if (!cookies || cookies.length === 0) return false;
-  await page.context().addCookies([{
-    name: 'ob_test_mode',
-    value: '1',
-    domain: 'localhost',
-    path: '/',
-  }]);
+  await setTestModeCookie(page);
   await page.context().addCookies(cookies);
   return true;
 }
@@ -59,12 +77,7 @@ async function restoreSubAuth(page) {
   if (!fs.existsSync(SUB_FILE)) return false;
   const { cookies } = JSON.parse(fs.readFileSync(SUB_FILE, 'utf8'));
   if (!cookies || cookies.length === 0) return false;
-  await page.context().addCookies([{
-    name: 'ob_test_mode',
-    value: '1',
-    domain: 'localhost',
-    path: '/',
-  }]);
+  await setTestModeCookie(page);
   await page.context().addCookies(cookies);
   return true;
 }
@@ -94,4 +107,4 @@ function isAuthPage(page) {
   return page.url().includes('page=login') || page.url().includes('mfa.php');
 }
 
-module.exports = { restoreAuth, restoreManagerAuth, restoreSubAuth, assertNoFatalErrors, isAuthPage };
+module.exports = { restoreAuth, restoreManagerAuth, restoreSubAuth, setTestModeCookie, getCookieDomain, assertNoFatalErrors, isAuthPage };

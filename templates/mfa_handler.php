@@ -31,7 +31,7 @@ $submitted = implode('', $_POST['code'] ?? []);
 $stored = $_SESSION['mfa_code'] ?? '';
 
 if ($submitted !== $stored) {
-    header("Location: ../mfa.php?lang=$lang&invalid=1");
+    header("Location: ../index.php?page=mfa&lang=$lang&invalid=1");
     exit;
 }
 
@@ -45,5 +45,5 @@ if (function_exists('session_regenerate_id')) {
 }
 
 // Redirect to dashboard
-header("Location: ../dashboard.php?lang=$lang");
+header("Location: ../index.php?page=dashboard&lang=$lang");
 exit;

@@ -1,0 +1,34 @@
+services:
+  openbuilder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openbuilder:test
+    container_name: openbuilder
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "1"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      # Path inside the container — the named volume `ob_data` is mounted at /var/www/html/data
+      DB_PATH: /var/www/html/data/openbuilder.sqlite
+      PHP_SESSION_DIR: /tmp/sessions
+    volumes:
+      # Named volume mounted onto a *directory* in the image so docker's
+      # volume mount is happy (it can't bind a volume onto a single file).
+      # Database.php opens __DIR__/../database.sqlite — we instead tell it
+      # to use /var/www/html/data/openbuilder.sqlite via DB_PATH env var.
+      - ob_data:/var/www/html/data
+      - ob_sessions:/tmp/sessions
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/?page=health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  ob_data:
+  ob_sessions:

@@ -65,7 +65,7 @@ $invalid = $_GET['invalid'] ?? false;
         <div class="invalid-box"><?php echo htmlspecialchars($l['invalid']); ?></div>
         <?php endif; ?>
         <p class="mfa-desc"><?php echo $sent ? htmlspecialchars($l['sent_desc']) : htmlspecialchars($l['desc']); ?></p>
-        <form method="POST" action="mfa_handler.php?lang=<?php echo $lang; ?>" class="space-y-6">
+        <form method="POST" action="templates/mfa_handler.php?lang=<?php echo $lang; ?>" class="space-y-6">
             <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
             <div class="code-inputs">
                 <?php for ($i = 0; $i < 6; $i++): ?>

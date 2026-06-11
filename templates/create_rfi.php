@@ -32,7 +32,7 @@
                     </select>
                 </div>
             </div>
-            <button class="flex w-full justify-center rounded bg-primary p-3 font-medium text-white hover:bg-opacity-90">
+            <button type="submit" class="flex w-full justify-center rounded bg-primary p-3 font-medium text-white hover:bg-opacity-90">
                 <?php echo $lang === 'es' ? 'Enviar RFI' : 'Submit RFI'; ?>
             </button>
         </div>

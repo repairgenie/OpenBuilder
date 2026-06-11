@@ -9,7 +9,11 @@ class Database {
             return self::$pdo;
         }
 
-        $db_file = __DIR__ . '/../database.sqlite';
+        $db_file = getenv('DB_PATH') ?: (__DIR__ . '/../database.sqlite');
+        $db_dir  = dirname($db_file);
+        if (!is_dir($db_dir)) {
+            @mkdir($db_dir, 0775, true);
+        }
         try {
             self::$pdo = new PDO("sqlite:$db_file");
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
