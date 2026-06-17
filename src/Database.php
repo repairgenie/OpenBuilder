@@ -26,13 +26,27 @@ class Database {
 
     private static function initTables() {
         self::$pdo->exec("
+            CREATE TABLE IF NOT EXISTS projects (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                client_id INTEGER,
+                status TEXT DEFAULT 'active',
+                description TEXT,
+                created_at TEXT DEFAULT (datetime('now')),
+                updated_at TEXT DEFAULT (datetime('now'))
+            )
+        ");
+
+        self::$pdo->exec("
             CREATE TABLE IF NOT EXISTS rfis (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ref_number TEXT NOT NULL,
                 subject TEXT NOT NULL,
                 status TEXT NOT NULL DEFAULT 'Open',
                 priority TEXT NOT NULL DEFAULT 'Medium',
-                due_date TEXT NOT NULL
+                due_date TEXT NOT NULL,
+                created_by INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         ");
 
@@ -65,6 +79,7 @@ class Database {
                 latitude REAL,
                 longitude REAL,
                 gps_stamp TEXT,
+                created_by INTEGER,
                 created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         ");
@@ -87,7 +102,9 @@ class Database {
                 name TEXT NOT NULL,
                 original_budget REAL NOT NULL DEFAULT 0,
                 change_orders REAL NOT NULL DEFAULT 0,
-                committed_costs REAL NOT NULL DEFAULT 0
+                committed_costs REAL NOT NULL DEFAULT 0,
+                created_by INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
         ");
 

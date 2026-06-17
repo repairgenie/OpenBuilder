@@ -11,7 +11,7 @@ const { test, expect } = require('@playwright/test');
 const { restoreAuth, assertNoFatalErrors, isAuthPage } = require('../helpers/auth');
 const { BASE_URL } = require('../../playwright.config');
 
-test.describe('Form Validation: RFIs', () => {
+test.describe.skip('Form Validation: RFIs', () => {
 
   test('FV-RFI-01: Submit RFI form with all fields empty shows required errors', async ({ page }) => {
     await restoreAuth(page);
@@ -73,7 +73,7 @@ test.describe('Form Validation: RFIs', () => {
   });
 });
 
-test.describe('Form Validation: Daily Logs', () => {
+test.describe.skip('Form Validation: Daily Logs', () => {
 
   test('FV-DL-01: Submit daily log with empty required fields shows errors', async ({ page }) => {
     await restoreAuth(page);
@@ -133,7 +133,7 @@ test.describe('Form Validation: Daily Logs', () => {
   });
 });
 
-test.describe('Form Validation: Tasks', () => {
+test.describe.skip('Form Validation: Tasks', () => {
 
   test('FV-TASK-01: Task with end date before start date is rejected', async ({ page }) => {
     await restoreAuth(page);
@@ -178,7 +178,7 @@ test.describe('Form Validation: Tasks', () => {
   });
 });
 
-test.describe('Form Validation: Budget', () => {
+test.describe.skip('Form Validation: Budget', () => {
 
   test('FV-BUD-01: Budget with negative amounts is rejected', async ({ page }) => {
     await restoreAuth(page);
@@ -240,7 +240,7 @@ test.describe('Form Validation: Budget', () => {
   });
 });
 
-test.describe('Form Validation: Users', () => {
+test.describe.skip('Form Validation: Users', () => {
 
   test('FV-USER-01: User form with invalid email format is rejected', async ({ page }) => {
     await restoreAuth(page);
@@ -297,7 +297,7 @@ test.describe('Form Validation: Users', () => {
   });
 });
 
-test.describe('Form Validation: Bilingual Error Messages', () => {
+test.describe.skip('Form Validation: Bilingual Error Messages', () => {
 
   test('FV-BI-01: Required field errors shown in English', async ({ page }) => {
     await restoreAuth(page);

@@ -14,7 +14,7 @@ test.describe('API Authorization', () => {
 
   test('API-AUTH-01: API endpoint without auth returns 401', async ({ page }) => {
     // Make a direct API call without any authentication
-    const response = await page.request.get(BASE_URL + '?page=api_handler', {
+    const response = await page.request.get(BASE_URL + '/api/projects', {
       headers: { 'Accept': 'application/json' }
     });
 
@@ -23,7 +23,7 @@ test.describe('API Authorization', () => {
   });
 
   test('API-AUTH-02: API endpoint with invalid token returns 401', async ({ page }) => {
-    const response = await page.request.get(BASE_URL + '?page=api_handler', {
+    const response = await page.request.get(BASE_URL + '/api/projects', {
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer invalid_token_12345'
@@ -34,35 +34,41 @@ test.describe('API Authorization', () => {
   });
 
   test('API-AUTH-03: API endpoint with valid admin token returns 200', async ({ page }) => {
-    // First login to get a valid session/token
+    // Login as Admin
     await page.goto(BASE_URL + '?page=login');
     await page.fill('input[name="email"]', 'admin@openbuilder.com');
     await page.fill('input[name="password"]', 'admin123');
     await page.click('button[type="submit"]');
     await page.waitForURL(/page=(?!login)/, { timeout: 10000 }).catch(() => {});
 
-    // Get the session cookie
-    const cookies = await page.context().cookies();
-    const sessionCookie = cookies.find(c => c.name === 'PHPSESSID' || c.name === 'session');
+    // Go to API Keys page and create one
+    await page.goto(BASE_URL + '?page=api_keys');
+    if(await page.locator('button:has-text("Create")').count() > 0) { await page.click('button:has-text("Create")'); await page.waitForTimeout(1000); } await page.fill('input[name="name"]', 'Test Token');
+    const saveBtn = page.locator('button[type="submit"]:has-text("Save"), button:has-text("Generate")').first();
+    await saveBtn.click();
+    await page.waitForTimeout(2000);
 
-    const headers = { 'Accept': 'application/json' };
-    if (sessionCookie) {
-      headers['Cookie'] = `${sessionCookie.name}=${sessionCookie.value}`;
-    }
+    // Attempt to scrape the generated API key from the page
+    const body = await page.textContent('body');
+    const match = body.match(/sk_[A-Za-z0-9]+/);
+    const validKey = match ? match[0] : null;
 
-    const response = await page.request.get(BASE_URL + '?page=api_handler', { headers });
-
-    // Should return 200 (or a JSON response, not a login page)
-    // If it returns a login page HTML, the API requires additional auth
-    const body = await response.text();
-    if (response.status() === 200) {
-      // Valid response - either JSON or redirect to login page check
-      expect(body.length).toBeGreaterThan(0);
+    // If we successfully generated a valid token, test it against the API
+    if (validKey) {
+        const headers = {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${validKey}`
+        };
+        const response = await page.request.get(BASE_URL + '/api/projects', { headers });
+        expect(response.status()).toBe(200);
+    } else {
+        // Fallback: If UI generation isn't supported yet, skip to avoid falsifying test results
+        test.skip(true, 'API Key UI generation is currently unlocatable.');
     }
   });
 
   test('API-AUTH-04: API POST without auth returns 401', async ({ page }) => {
-    const response = await page.request.post(BASE_URL + '?page=api_handler', {
+    const response = await page.request.post(BASE_URL + '/api/projects', {
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
       data: JSON.stringify({ action: 'test' })
     });
@@ -71,7 +77,7 @@ test.describe('API Authorization', () => {
   });
 
   test('API-AUTH-05: API POST with invalid token returns 401', async ({ page }) => {
-    const response = await page.request.post(BASE_URL + '?page=api_handler', {
+    const response = await page.request.post(BASE_URL + '/api/projects', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -85,16 +91,16 @@ test.describe('API Authorization', () => {
 
   test('API-AUTH-06: API endpoint rejects expired session', async ({ page }) => {
     // Create a context with an expired/old session cookie
-    const context = await browser.newContext();
+    const context = await page.context().browser().newContext();
     await context.addCookies([{
       name: 'PHPSESSID',
       value: 'expired_or_invalid_session_value',
-      domain: (new URL(BASE_URL).hostname),
+      domain: (new URL(BASE_URL || 'http://localhost:8000').hostname),
       path: '/'
     }]);
 
     const newPage = await context.newPage();
-    const response = await newPage.request.get(BASE_URL + '?page=api_handler', {
+    const response = await newPage.request.get(BASE_URL + '/api/projects', {
       headers: { 'Accept': 'application/json' }
     });
 
@@ -123,7 +129,7 @@ test.describe('API Authorization', () => {
   });
 
   test('API-AUTH-08: CORS preflight is handled correctly', async ({ page }) => {
-    const response = await page.request.fetch(BASE_URL + '?page=api_handler', {
+    const response = await page.request.fetch(BASE_URL + '/api/projects', {
       method: 'OPTIONS',
       headers: {
         'Origin': 'http://example.com',
@@ -140,7 +146,7 @@ test.describe('API Authorization', () => {
 
   test('API-AUTH-09: API does not expose stack traces on error', async ({ page }) => {
     // Send a malformed request
-    const response = await page.request.get(BASE_URL + '?page=api_handler&invalid_param=%', {
+    const response = await page.request.get(BASE_URL + '/api/projects?invalid_param=%', {
       headers: { 'Accept': 'application/json' }
     });
 
@@ -156,18 +162,18 @@ test.describe('API Authorization', () => {
     // Make many rapid requests to the API
     const responses = [];
     for (let i = 0; i < 20; i++) {
-      const response = await page.request.get(BASE_URL + '?page=api_handler', {
+      const response = await page.request.get(BASE_URL + '/api/projects', {
         headers: { 'Accept': 'application/json' }
       });
       responses.push(response.status());
     }
 
     // After many rapid requests, should eventually get rate limited (429)
-    // or all requests should succeed (no rate limiting)
+    // or all requests should fail appropriately since we passed no token (401)
     const has429 = responses.includes(429);
-    const allSuccess = responses.every(r => r === 200);
+    const allUnauthorized = responses.every(r => r === 401 || r === 403);
 
-    // Either rate limiting is enforced (has429) or it's not (all200)
-    expect(has429 || allSuccess).toBe(true);
+    // Either rate limiting is enforced before auth checks (has429) or all fail auth (allUnauthorized)
+    expect(has429 || allUnauthorized).toBe(true);
   });
 });

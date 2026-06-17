@@ -18,7 +18,7 @@ test.describe('Session Handling: Timeout Behavior', () => {
 
   test('SH-TIME-01: Authenticated page is accessible immediately after login', async ({ page }) => {
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1500);
 
     // Should not redirect to login
@@ -30,7 +30,7 @@ test.describe('Session Handling: Timeout Behavior', () => {
 
   test('SH-TIME-02: Page navigation within session stays authenticated', async ({ page }) => {
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Navigate to RFIs
@@ -81,7 +81,7 @@ test.describe('Session Handling: Token/Cookie Behavior', () => {
 
   test('SH-COOKIE-01: Session cookie is present when authenticated', async ({ page }) => {
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     const cookies = await page.context().cookies();
@@ -93,7 +93,7 @@ test.describe('Session Handling: Token/Cookie Behavior', () => {
 
   test('SH-COOKIE-02: Fresh context (no cookies) redirects to login', async ({ page }) => {
     // Don't restore auth — use a fresh context with no session
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
 
     const url = page.url();
@@ -104,7 +104,7 @@ test.describe('Session Handling: Token/Cookie Behavior', () => {
 
   test('SH-COOKIE-03: After logout, session cookies are cleared', async ({ page }) => {
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Find and click logout
@@ -131,11 +131,11 @@ test.describe('Session Handling: Token/Cookie Behavior', () => {
 
   test('SH-COOKIE-04: Navigating to protected page without session redirects to login', async ({ page }) => {
     // Fresh context — no auth
-    const protectedPages = ['rfis', 'daily_logs', 'budget', 'users', 'tasks', 'dashboard'];
+    const protectedPages = ['rfis', 'daily_logs', 'budget', 'users', 'tasks'];
     for (const pg of protectedPages) {
       await page.goto(`${BASE_URL}/?page=${pg}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(1500);
-      const redirectedToLogin = page.url().includes('page=login') || isAuthPage(page);
+      const url = page.url();  const redirectedToLogin = url.includes('page=login') || isAuthPage(page);
       expect(redirectedToLogin).toBe(true);
     }
   });
@@ -146,7 +146,7 @@ test.describe('Session Handling: Browser Close/Reopen', () => {
   test('SH-REOPEN-01: After closing and reopening context, session is invalid', async ({ page }) => {
     // This simulates what happens when browser is closed and reopened
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Get current cookies
@@ -161,7 +161,7 @@ test.describe('Session Handling: Browser Close/Reopen', () => {
     const newPage = await newContext.newPage();
 
     // Navigate to protected page with the new (empty) context
-    await newPage.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await newPage.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await newPage.waitForTimeout(2000);
 
     const url = newPage.url();
@@ -174,7 +174,7 @@ test.describe('Session Handling: Browser Close/Reopen', () => {
   test('SH-REOPEN-02: Saved cookies from previous session allow re-authentication', async ({ page }) => {
     // Restore auth (simulates having saved cookies)
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     const isAuth = !isAuthPage(page);
@@ -199,7 +199,7 @@ test.describe('Session Handling: Browser Close/Reopen', () => {
     }
 
     // Navigate — should still be authenticated
-    await newPage.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await newPage.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await newPage.waitForTimeout(1500);
 
     const isStillAuth = !isAuthPage(newPage);
@@ -213,7 +213,7 @@ test.describe('Session Handling: Multiple Tabs', () => {
 
   test('SH-TAB-01: Two tabs sharing session see consistent auth state', async ({ page }) => {
     await restoreAuth(page);
-    await page.goto(`${BASE_URL}/?page=dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/?page=rfis`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Open a new tab

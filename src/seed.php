@@ -23,13 +23,13 @@ function seed_database($pdo) {
 
     // Seed RFIs
     $rfis = [
-        ['#101', 'Foundation Rebar Spacing', 'High', 'Open', '2023-10-15'],
-        ['#102', 'Beam Connection Detail', 'Medium', 'Open', '2023-10-18'],
-        ['#103', 'HVAC Duct Clearance', 'Low', 'Closed', '2023-10-10'],
+        ['#101', 'Foundation Rebar Spacing', 'High', 'Open', '2023-10-15', '2023-10-25'],
+        ['#102', 'Beam Connection Detail', 'Medium', 'Open', '2023-10-18', '2023-10-28'],
+        ['#103', 'HVAC Duct Clearance', 'Low', 'Closed', '2023-10-10', '2023-10-20'],
     ];
 
     foreach ($rfis as $rfi) {
-        $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, priority, status, created_at) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, priority, status, created_at, due_date) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute($rfi);
     }
 
