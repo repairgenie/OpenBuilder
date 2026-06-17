@@ -45,9 +45,11 @@ switch ($action) {
         }
 
         $api_key = generate_api_key();
+        $hash = hash('sha256', $api_key);
         try {
             $stmt = $pdo->prepare("INSERT INTO api_keys (user_id, name, api_key, created_at) VALUES (?, ?, ?, datetime('now'))");
-            $stmt->execute([$user_id, $name, $api_key]);
+            // Store the hash, show the plaintext to the user
+            $stmt->execute([$user_id, $name, $hash]);
             $_SESSION['flash_success'] = $lang === 'es' ? 'Clave API creada exitosamente.' : 'API key created successfully.';
             $_SESSION['new_api_key'] = $api_key;
         } catch (PDOException $e) {

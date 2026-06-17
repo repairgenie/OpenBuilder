@@ -5,6 +5,7 @@ require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/AIProvider.php';
 require_once __DIR__ . '/ModuleRegistry.php';
 require_once __DIR__ . '/security_helper.php';
+require_once __DIR__ . '/GPSEngine.php';
 
 // Initialize System
 ModuleRegistry::init();
@@ -104,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
     switch ($_POST['action']) {
         case 'create_rfi':
+            if (empty(trim($_POST['subject'] ?? ''))) { header("Location: index.php?page=create_rfi&error=required"); die(); }
             if (!has_role(['Worker', 'Manager', 'Admin'])) {
                 header("HTTP/1.1 403 Forbidden");
                 exit;
@@ -111,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt = $pdo->prepare("INSERT INTO rfis (ref_number, subject, status, priority, due_date, created_by) VALUES (:ref_number, :subject, :status, :priority, :due_date, :created_by)");
             $stmt->execute([
                 ':ref_number' => $_POST['ref_number'] ?? '',
-                ':subject' => $_POST['subject'] ?? '',
+                ':subject' => trim($_POST['subject'] ?? ''),
                 ':status' => $_POST['status'] ?? 'Open',
                 ':priority' => $_POST['priority'] ?? 'Medium',
                 ':due_date' => $_POST['due_date'] ?? '',

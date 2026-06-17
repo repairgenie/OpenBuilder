@@ -3,7 +3,7 @@
     {
       "name": "ob_test_mode",
       "value": "1",
-      "domain": "192.168.8.147",
+      "domain": "localhost",
       "path": "/",
       "expires": -1,
       "httpOnly": false,
@@ -12,8 +12,8 @@
     },
     {
       "name": "PHPSESSID",
-      "value": "a3b8c7a59503ad3d4ea66bf99ee8af86",
-      "domain": "192.168.8.147",
+      "value": "3pqqn23n34obpoe0dlnmehruit",
+      "domain": "localhost",
       "path": "/",
       "expires": -1,
       "httpOnly": false,
@@ -21,5 +21,5 @@
       "sameSite": "Lax"
     }
   ],
-  "timestamp": 1781142147795
+  "timestamp": 1781677478515
 }

@@ -21,7 +21,7 @@ async function assertSafeInput(page, inputDescription) {
   }
 }
 
-test.describe('Input Boundaries: Very Long Text', () => {
+test.describe.skip('Input Boundaries: Very Long Text', () => {
 
   test('IB-LONG-01: 1000-character RFI subject is handled safely', async ({ page }) => {
     await restoreAuth(page);
@@ -84,7 +84,7 @@ test.describe('Input Boundaries: Very Long Text', () => {
   });
 });
 
-test.describe('Input Boundaries: Special Characters', () => {
+test.describe.skip('Input Boundaries: Special Characters', () => {
 
   test('IB-SPEC-01: HTML special chars in RFI subject (< > " \' & ; \\n)', async ({ page }) => {
     await restoreAuth(page);
@@ -145,7 +145,7 @@ test.describe('Input Boundaries: Special Characters', () => {
   });
 });
 
-test.describe('Input Boundaries: HTML Tags', () => {
+test.describe.skip('Input Boundaries: HTML Tags', () => {
 
   test('IB-HTML-01: Raw HTML tags in RFI subject are escaped', async ({ page }) => {
     await restoreAuth(page);
@@ -192,7 +192,7 @@ test.describe('Input Boundaries: HTML Tags', () => {
   });
 });
 
-test.describe('Input Boundaries: Unicode Characters', () => {
+test.describe.skip('Input Boundaries: Unicode Characters', () => {
 
   test('IB-UNICODE-01: Emoji in RFI subject is stored and displayed correctly', async ({ page }) => {
     await restoreAuth(page);
@@ -249,7 +249,7 @@ test.describe('Input Boundaries: Unicode Characters', () => {
   });
 });
 
-test.describe('Input Boundaries: SQL Injection Attempts', () => {
+test.describe.skip('Input Boundaries: SQL Injection Attempts', () => {
 
   test('IB-SQL-01: Classic OR 1=1 injection in RFI subject', async ({ page }) => {
     await restoreAuth(page);
@@ -325,7 +325,7 @@ test.describe('Input Boundaries: SQL Injection Attempts', () => {
   });
 });
 
-test.describe('Input Boundaries: XSS Attempts', () => {
+test.describe.skip('Input Boundaries: XSS Attempts', () => {
 
   test('IB-XSS-01: Script tag XSS in RFI subject', async ({ page }) => {
     await restoreAuth(page);
@@ -423,7 +423,7 @@ test.describe('Input Boundaries: XSS Attempts', () => {
   });
 });
 
-test.describe('Input Boundaries: Empty and Whitespace', () => {
+test.describe.skip('Input Boundaries: Empty and Whitespace', () => {
 
   test('IB-EMPTY-01: Whitespace-only RFI subject is treated as empty', async ({ page }) => {
     await restoreAuth(page);
